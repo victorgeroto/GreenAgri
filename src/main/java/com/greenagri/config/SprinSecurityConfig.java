@@ -42,8 +42,8 @@ public class SprinSecurityConfig {
 	@Bean
 	public InMemoryUserDetailsManager userDetailsService(){
 		UserDetails user = User.withDefaultPasswordEncoder()
-				.username("Pedro")
-				.password("senai")
+				.username("Victor")
+				.password("12345@senai")
 				.roles("USER")
 				.build();
 		return new InMemoryUserDetailsManager(user);
