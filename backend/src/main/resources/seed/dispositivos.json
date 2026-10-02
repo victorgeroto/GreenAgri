@@ -1,0 +1,38 @@
+[
+  {
+    "codigo": "EST-01", "nome": "Estação meteorológica - Sede", "tipo": "ESTACAO_METEOROLOGICA",
+    "localizacao": "Sede da fazenda", "latitude": -24.9555, "longitude": -53.4552,
+    "apiKey": "dev-key-est-01", "firmware": "1.2.0",
+    "simulacao": { "temperaturaMedia": 22, "amplitude": 7, "umidadeAr": 68, "bateria": 92 }
+  },
+  {
+    "codigo": "SOLO-T02", "nome": "Sensor de solo - Talhão T-02", "tipo": "SENSOR_SOLO",
+    "localizacao": "Talhão T-02 (milho)", "latitude": -24.9611, "longitude": -53.4687,
+    "apiKey": "dev-key-solo-t02", "firmware": "1.2.0",
+    "simulacao": { "umidadeSoloInicial": 34, "umidadeSoloFinal": 22, "bateria": 71 }
+  },
+  {
+    "codigo": "SOLO-T03", "nome": "Sensor de solo - Talhão T-03", "tipo": "SENSOR_SOLO",
+    "localizacao": "Talhão T-03 (soja)", "latitude": -24.9502, "longitude": -53.4801,
+    "apiKey": "dev-key-solo-t03", "firmware": "1.1.4",
+    "simulacao": { "umidadeSoloInicial": 41, "umidadeSoloFinal": 37, "bateria": 17 }
+  },
+  {
+    "codigo": "SOLO-T05", "nome": "Sensor de solo - Talhão T-05", "tipo": "SENSOR_SOLO",
+    "localizacao": "Talhão T-05 (feijão)", "latitude": -24.9688, "longitude": -53.4495,
+    "apiKey": "dev-key-solo-t05", "firmware": "1.1.4",
+    "simulacao": { "umidadeSoloInicial": 30, "umidadeSoloFinal": 29, "bateria": 55, "offlineHoras": 9 }
+  },
+  {
+    "codigo": "SILO-01", "nome": "Silo 1 - Soja", "tipo": "SENSOR_SILO",
+    "localizacao": "Armazém central", "latitude": -24.9561, "longitude": -53.4570,
+    "apiKey": "dev-key-silo-01", "firmware": "2.0.1", "produtoSku": "GR-SOJA-01", "capacidadeKg": 300000,
+    "simulacao": { "temperaturaInicial": 23, "temperaturaFinal": 24, "divergencia": 0.01, "bateria": 100 }
+  },
+  {
+    "codigo": "SILO-02", "nome": "Silo 2 - Milho", "tipo": "SENSOR_SILO",
+    "localizacao": "Armazém central", "latitude": -24.9563, "longitude": -53.4574,
+    "apiKey": "dev-key-silo-02", "firmware": "2.0.1", "produtoSku": "GR-MILHO-01", "capacidadeKg": 200000,
+    "simulacao": { "temperaturaInicial": 25, "temperaturaFinal": 31.5, "divergencia": -0.15, "bateria": 100 }
+  }
+]
