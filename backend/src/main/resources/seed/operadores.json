@@ -1,0 +1,23 @@
+[
+  { "matricula": "OP-001", "nome": "Carlos Mendes", "funcao": "OPERADOR_MAQUINAS", "turno": "INTEGRAL", "cnh": "C",
+    "habilitacoes": ["COLHEITADEIRA", "TRATOR", "PULVERIZADOR"] },
+  { "matricula": "OP-002", "nome": "Ana Paula Ribeiro", "funcao": "OPERADOR_MAQUINAS", "turno": "MANHA", "cnh": "B",
+    "habilitacoes": ["PULVERIZADOR", "TRATOR"] },
+  { "matricula": "OP-003", "nome": "José Aparecido Lima", "funcao": "TRATORISTA", "turno": "MANHA", "cnh": "C",
+    "habilitacoes": ["TRATOR"],
+    "alocacao": { "atividade": "PLANTIO", "veiculo": "TR-01", "talhao": "T-05", "descricao": "Preparo do solo e plantio do feijão", "horasAtras": 3, "horasPrevistas": 6 } },
+  { "matricula": "OP-004", "nome": "Marcos Vinícius Rocha", "funcao": "MOTORISTA", "turno": "INTEGRAL", "cnh": "E",
+    "habilitacoes": ["CAMINHAO", "UTILITARIO"],
+    "alocacao": { "atividade": "TRANSPORTE", "veiculo": "RHK4F21", "descricao": "Entrega de soja na cooperativa", "horasAtras": 2, "horasPrevistas": 4 } },
+  { "matricula": "OP-005", "nome": "Luiz Fernando Costa", "funcao": "MECANICO", "turno": "INTEGRAL", "cnh": "B",
+    "habilitacoes": ["TRATOR", "UTILITARIO"],
+    "alocacao": { "atividade": "MANUTENCAO", "veiculo": "TR-02", "descricao": "Troca da bomba hidráulica", "horasAtras": 26, "horasPrevistas": 30 } },
+  { "matricula": "OP-006", "nome": "Rafael Souza", "funcao": "TRATORISTA", "turno": "TARDE", "cnh": "C",
+    "habilitacoes": ["TRATOR", "COLHEITADEIRA"], "ausenteDias": 8, "motivoAusencia": "Férias" },
+  { "matricula": "OP-007", "nome": "Juliana Martins", "funcao": "TECNICO_AGRICOLA", "turno": "MANHA", "cnh": "B",
+    "habilitacoes": ["UTILITARIO"] },
+  { "matricula": "OP-008", "nome": "Antônio Carlos Pereira", "funcao": "AUXILIAR_CAMPO", "turno": "INTEGRAL",
+    "habilitacoes": [] },
+  { "matricula": "OP-009", "nome": "Diego Almeida", "funcao": "OPERADOR_MAQUINAS", "turno": "NOITE", "cnh": "D",
+    "habilitacoes": ["COLHEITADEIRA", "CAMINHAO"], "ausenteDias": 1, "motivoAusencia": "Atestado médico" }
+]
