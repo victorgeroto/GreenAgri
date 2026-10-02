@@ -53,6 +53,9 @@ public class ProdutoService {
 		if (produtos.existsBySkuIgnoreCaseAndIdNot(req.sku(), id)) {
 			throw new RegraNegocioException("Já existe um produto com o SKU " + req.sku());
 		}
+		if (req.unidade() != produto.getUnidade() && produto.getQuantidadeAtual().signum() != 0) {
+			throw new RegraNegocioException("Não é possível trocar a unidade de um produto com saldo em estoque");
+		}
 		aplicar(produto, req);
 		return produto;
 	}

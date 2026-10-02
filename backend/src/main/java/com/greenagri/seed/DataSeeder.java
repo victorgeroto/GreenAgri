@@ -253,8 +253,8 @@ public class DataSeeder implements ApplicationRunner {
 			case SENSOR_SILO -> {
 				double temp = interpolar(sim.temperaturaInicial(), sim.temperaturaFinal(), progresso * progresso)
 						+ ruido(0.15);
-				yield new LeituraPayload(ts, arredondar(temp), null, null, nivelSilo(d, sim) + ruido(0.2), bateria,
-						rssi);
+				yield new LeituraPayload(ts, arredondar(temp), null, null, arredondar(nivelSilo(d, sim) + ruido(0.2)),
+						bateria, rssi);
 			}
 		};
 	}
