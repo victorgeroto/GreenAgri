@@ -9,6 +9,7 @@ import com.greenagri.auth.UsuarioRepository;
 import com.greenagri.fazenda.FazendaDtos.FazendaRequest;
 import com.greenagri.fazenda.FazendaDtos.FazendaResponse;
 import com.greenagri.shared.RecursoNaoEncontradoException;
+import com.greenagri.shared.RegraNegocioException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +28,9 @@ public class FazendaService {
 	/** Cria a fazenda e dá acesso a quem cadastrou. */
 	@Transactional
 	public FazendaResponse criar(FazendaRequest req, String email) {
+		if (fazendas.doUsuario(email).stream().anyMatch(f -> f.getNome().equalsIgnoreCase(req.nome().trim()))) {
+			throw new RegraNegocioException("Você já tem uma fazenda chamada " + req.nome().trim());
+		}
 		Fazenda f = new Fazenda();
 		aplicar(f, req);
 		f.getMembros().add(usuarios.findByEmailIgnoreCase(email)

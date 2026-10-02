@@ -98,6 +98,9 @@ class MultiFazendaIntegrationTest {
 			.andExpect(status().isCreated())
 			.andReturn().getResponse().getContentAsString();
 		long nova = mapper.readTree(criada).get("id").asLong();
+		mvc.perform(post("/api/fazendas").with(admin(SANTA_HELENA)).contentType(MediaType.APPLICATION_JSON)
+			.content("{\"nome\":\"sítio teste\",\"municipio\":\"Xanxerê\",\"uf\":\"SC\"}"))
+			.andExpect(status().isUnprocessableEntity());
 
 		mvc.perform(get("/api/produtos").with(admin(nova))).andExpect(jsonPath("$", hasSize(0)));
 		mvc.perform(get("/api/dashboard").with(admin(nova))).andExpect(jsonPath("$.produtos").value(0));
