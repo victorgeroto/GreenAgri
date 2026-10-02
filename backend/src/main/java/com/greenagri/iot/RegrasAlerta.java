@@ -50,6 +50,9 @@ public final class RegrasAlerta {
 							l.getTemperatura()));
 				}
 			}
+			case RASTREADOR_MAQUINA -> {
+				// Sem regras agronômicas: a posição alimenta o geofence de talhões.
+			}
 			case SENSOR_SILO -> {
 				if (l.getTemperatura() != null && l.getTemperatura() >= SILO_AQUECIMENTO) {
 					disparos.add(new Disparo(Tipo.SILO_AQUECIMENTO, Severidade.CRITICO,

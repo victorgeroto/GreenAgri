@@ -16,6 +16,7 @@ import com.greenagri.iot.IotDtos.DispositivoResponse;
 import com.greenagri.iot.IotDtos.LeituraResponse;
 import com.greenagri.iot.IotDtos.ProvisionamentoResponse;
 import com.greenagri.iot.IotDtos.ReconciliacaoSilo;
+import com.greenagri.frota.VeiculoRepository;
 import com.greenagri.produto.Produto;
 import com.greenagri.produto.ProdutoRepository;
 import com.greenagri.shared.RecursoNaoEncontradoException;
@@ -34,6 +35,7 @@ public class IotService {
 	private final LeituraRepository leituras;
 	private final AlertaRepository alertas;
 	private final ProdutoRepository produtos;
+	private final VeiculoRepository veiculos;
 	private final GreenAgriProperties props;
 
 	@Transactional(readOnly = true)
@@ -66,6 +68,10 @@ public class IotService {
 		d.setLatitude(req.latitude());
 		d.setLongitude(req.longitude());
 		d.setCapacidadeKg(req.capacidadeKg());
+		if (req.veiculoId() != null) {
+			d.setVeiculo(veiculos.findById(req.veiculoId())
+				.orElseThrow(() -> new RecursoNaoEncontradoException("Veículo", req.veiculoId())));
+		}
 		d.setApiKeyHash(ChaveDispositivo.hash(apiKey));
 		if (req.produtoId() != null) {
 			d.setProduto(produtos.findById(req.produtoId())
@@ -97,7 +103,8 @@ public class IotService {
 		boolean online = d.getUltimoContato() != null && d.getUltimoContato().isAfter(limiteOnline);
 		return new DispositivoResponse(d.getId(), d.getCodigo(), d.getNome(), d.getTipo(), d.getLocalizacao(),
 				d.getLatitude(), d.getLongitude(), d.getFirmwareVersao(), d.getUltimoContato(), online,
-				d.getBateria(), ultima, reconciliar(d, ultima));
+				d.getBateria(), ultima, reconciliar(d, ultima), d.getVeiculo() == null ? null : d.getVeiculo().getId(),
+				d.getVeiculo() == null ? null : d.getVeiculo().getIdentificacao());
 	}
 
 	/**

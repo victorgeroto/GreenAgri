@@ -11,7 +11,7 @@ interface Props {
   titulo: string
   unidade: string
   dados: Leitura[]
-  campo: keyof Pick<Leitura, 'temperatura' | 'umidadeAr' | 'umidadeSolo' | 'nivelPercentual' | 'bateria'>
+  campo: keyof Pick<Leitura, 'temperatura' | 'umidadeAr' | 'umidadeSolo' | 'nivelPercentual' | 'bateria' | 'velocidade'>
   limite?: { valor: number; rotulo: string }
   dominio?: [number | 'auto', number | 'auto']
 }

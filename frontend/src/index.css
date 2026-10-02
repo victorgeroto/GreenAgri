@@ -10,3 +10,26 @@
     @apply bg-[#f6f8f3] font-sans text-stone-900 antialiased;
   }
 }
+
+/* Mapa: rótulo fixo de cada talhão (código, cultura e status por extenso). */
+.leaflet-tooltip.rotulo-talhao {
+  cursor: pointer;
+  @apply rounded-lg border-0 bg-white/90 px-2 py-1 text-center text-[11px] leading-tight text-stone-800 shadow;
+}
+.leaflet-tooltip.rotulo-talhao::before {
+  display: none;
+}
+.leaflet-tooltip.rotulo-talhao span {
+  @apply text-stone-600;
+}
+
+/* Mapa: máquina com rastreador; destaque quando o implemento está operando. */
+.marcador-maquina {
+  @apply flex h-6 w-16 items-center justify-center rounded-full border-2 border-white bg-stone-800 text-[11px] font-semibold text-white shadow-md;
+}
+.marcador-maquina.operando {
+  @apply bg-[#eb6834];
+}
+.leaflet-container {
+  font-family: inherit;
+}

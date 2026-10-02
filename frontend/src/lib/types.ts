@@ -78,11 +78,15 @@ export interface MovimentacaoInput {
   ocorridoEm: string
 }
 
-export type StatusColheita = 'PLANEJADA' | 'EM_ANDAMENTO' | 'CONCLUIDA'
+export type StatusColheita = 'PLANEJADA' | 'EM_DESENVOLVIMENTO' | 'EM_COLHEITA' | 'CONCLUIDA'
 
 export interface Colheita {
   id: number
+  talhaoId: number
+  /** Código do talhão (ex.: T-04). */
   talhao: string
+  /** Ano-safra, ex.: 2025/26. */
+  safra: string
   cultura: string
   areaHa: number
   dataPlantio: string
@@ -91,16 +95,20 @@ export interface Colheita {
   producaoEstimadaKg?: number
   producaoRealKg?: number
   status: StatusColheita
+  statusDesde: string
   produtoId?: number
   produtoNome?: string
   observacoes?: string
   produtividadeSacasHa?: number
+  /** Somente no cliente: mudança de status ainda na fila offline. */
+  statusPendente?: boolean
 }
 
 export interface ColheitaInput {
-  talhao: string
+  talhaoId: number
   cultura: string
-  areaHa: number
+  safra?: string
+  areaHa?: number
   dataPlantio: string
   previsaoColheita: string
   producaoEstimadaKg?: number
@@ -127,7 +135,7 @@ export interface Veiculo {
 
 export type VeiculoInput = Omit<Veiculo, 'id' | 'manutencaoPendente'>
 
-export type TipoDispositivo = 'ESTACAO_METEOROLOGICA' | 'SENSOR_SOLO' | 'SENSOR_SILO'
+export type TipoDispositivo = 'ESTACAO_METEOROLOGICA' | 'SENSOR_SOLO' | 'SENSOR_SILO' | 'RASTREADOR_MAQUINA'
 
 export interface Leitura {
   medidoEm: string
@@ -137,6 +145,11 @@ export interface Leitura {
   nivelPercentual?: number
   bateria?: number
   rssi?: number
+  latitude?: number
+  longitude?: number
+  /** km/h */
+  velocidade?: number
+  operando?: boolean
 }
 
 export interface ReconciliacaoSilo {
@@ -163,6 +176,8 @@ export interface Dispositivo {
   bateria?: number
   ultimaLeitura?: Leitura
   silo?: ReconciliacaoSilo
+  veiculoId?: number
+  veiculoIdentificacao?: string
 }
 
 export type SeveridadeAlerta = 'INFO' | 'AVISO' | 'CRITICO'
@@ -192,4 +207,38 @@ export interface ResumoDashboard {
   dispositivos: number
   alertasIotAbertos: number
   silos: Dispositivo[]
+}
+
+/** Polígono GeoJSON; coordenadas em [longitude, latitude]. */
+export interface Poligono {
+  type: 'Polygon'
+  coordinates: [number, number][][]
+}
+
+export interface Talhao {
+  id: number
+  codigo: string
+  nome: string
+  geometria?: Poligono
+  areaHa?: number
+  latitude?: number
+  longitude?: number
+}
+
+export interface TalhaoInput {
+  codigo: string
+  nome: string
+  geometria?: Poligono
+}
+
+export interface EventoColheita {
+  id: number
+  statusAnterior?: StatusColheita
+  statusNovo: StatusColheita
+  origem: 'MANUAL' | 'DISPOSITIVO'
+  responsavel?: string
+  observacao?: string
+  latitude?: number
+  longitude?: number
+  ocorridoEm: string
 }

@@ -4,6 +4,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Backend para onde o dev server/preview encaminha /api (ex.: API_PROXY=http://localhost:8090).
+const API_PROXY = process.env.API_PROXY ?? 'http://localhost:8080'
+
 export default defineConfig({
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
@@ -35,19 +38,32 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff2}'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/],
+        // Imagens do mapa já vistas ficam disponíveis offline. Só guarda o que o usuário abriu
+        // (sem pré-download em massa, que a política de uso do OpenStreetMap proíbe).
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/(tile\.openstreetmap\.org|server\.arcgisonline\.com)\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'mapa-tiles',
+              expiration: { maxEntries: 800, maxAgeSeconds: 60 * 60 * 24 * 14 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
     }),
   ],
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:8080',
+      '/api': API_PROXY,
     },
   },
   preview: {
     port: 4173,
     proxy: {
-      '/api': 'http://localhost:8080',
+      '/api': API_PROXY,
     },
   },
   test: {

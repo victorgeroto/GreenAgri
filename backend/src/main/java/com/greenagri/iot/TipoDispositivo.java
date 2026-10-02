@@ -6,5 +6,7 @@ public enum TipoDispositivo {
 	/** Umidade do solo no talhão (apoio à irrigação). */
 	SENSOR_SOLO,
 	/** Nível (ultrassom) e termometria do grão armazenado. */
-	SENSOR_SILO
+	SENSOR_SILO,
+	/** GNSS + estado de operação de uma máquina (geofence de talhões). */
+	RASTREADOR_MAQUINA
 }

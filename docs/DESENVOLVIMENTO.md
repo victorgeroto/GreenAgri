@@ -33,6 +33,8 @@ node firmware/simulador/simulador.mjs
 - Console H2: http://localhost:8080/h2-console (JDBC URL `jdbc:h2:mem:greenagri`, usuário `sa`)
 
 > O service worker só é gerado no build. Para testar offline de verdade, rode `npm run build && npm run preview` (porta 4173) e use a aba *Network → Offline* do DevTools.
+>
+> Se a API estiver em outra porta, aponte o proxy com `API_PROXY=http://localhost:8090 npm run dev` e libere a origem do app em `GREENAGRI_CORS_ORIGENS`.
 
 ### Com Docker
 
@@ -46,7 +48,7 @@ O app fica em http://localhost:8081 e a API em http://localhost:8080, com Postgr
 
 ```bash
 cd backend && ./mvnw test        # unitários (regras, reconciliação) + integração (MockMvc)
-cd frontend && npm test          # camada offline: fila, cache e projeção de saldo
+cd frontend && npm test          # camada offline (fila, cache, projeção de saldo), geometria e safra
 cd frontend && npm run typecheck
 ```
 
@@ -61,7 +63,8 @@ Organizado **por domínio** (cada pacote tem entidade, repositório, serviço, D
 | `auth` | Usuários, login/registro, emissão de JWT (HS256) |
 | `produto` | Cadastro de produtos; o saldo **não** é editável diretamente |
 | `estoque` | Movimentações (entrada, saída e inventário) e alertas de estoque mínimo |
-| `colheita` | Safras por talhão; concluir lança a produção no estoque |
+| `talhao` | Talhões georreferenciados (GeoJSON), área e centróide calculados, ponto-no-polígono |
+| `colheita` | Lavouras por talhão e safra, ciclo de status com histórico de eventos; concluir lança a produção no estoque |
 | `frota` | Máquinas e veículos, horímetro e revisões |
 | `iot` | Telemetria, regras de alerta, painel e reconciliação silo × estoque |
 | `dashboard` | Indicadores consolidados |
@@ -75,6 +78,10 @@ Organizado **por domínio** (cada pacote tem entidade, repositório, serviço, D
 - **Idempotência**: uma movimentação com `idCliente` (UUID) já processado devolve o registro existente, o que torna seguro o reenvio da fila offline.
 - **Horário do campo**: `ocorridoEm` aceita o horário do aparelho (lançamento feito offline), mas nunca no futuro.
 - **Colheita → estoque**: concluir converte kg na unidade do produto (saca de 60 kg, tonelada) e lança uma entrada.
+- **Ciclo da lavoura**: planejada → em desenvolvimento → em colheita → concluída. O status só avança, e cada mudança grava um evento (quem, quando, de onde, origem manual ou dispositivo).
+- **Um talhão, uma lavoura ativa**: plantar soja num talhão com milho em desenvolvimento é recusado (422). A rotação na mesma safra (soja → milho safrinha) é permitida depois da conclusão.
+- **Safra**: calculada pela data de plantio no padrão jul–jun (ago/2025 → 2025/26), podendo ser informada manualmente.
+- **Geofence**: colheitadeira com rastreador operando dentro de um talhão com lavoura em desenvolvimento muda o status para *em colheita* (ver [SISTEMA-EMBARCADO.md](SISTEMA-EMBARCADO.md)).
 - **Unidade imutável com saldo**: trocar sacas por kg num produto com estoque é recusado.
 
 ### Perfis
@@ -95,9 +102,13 @@ O schema é versionado pelo **Flyway** (`db/migration`), e o Hibernate não alte
 | GET/PUT/DELETE | `/api/produtos/{id}` | Detalhe / edita / exclui (ADMIN) |
 | GET/POST | `/api/estoque/movimentacoes` | Histórico (`?produtoId=`) / lança |
 | GET | `/api/estoque/alertas` | Produtos abaixo do mínimo |
-| GET/POST | `/api/colheitas` | Lista / cria |
+| GET/POST | `/api/colheitas` | Lista (`?safra=2025/26`) / cria |
 | PUT/DELETE | `/api/colheitas/{id}` | Edita / exclui |
 | POST | `/api/colheitas/{id}/concluir` | Conclui e lança no estoque |
+| POST | `/api/colheitas/{id}/status` | Avança o ciclo (`{"status":"EM_COLHEITA"}`) |
+| GET | `/api/colheitas/{id}/eventos` · `/api/colheitas/safras` | Histórico de status · safras existentes |
+| GET/POST | `/api/talhoes` | Talhões com polígono GeoJSON / cadastra (área calculada) |
+| PUT/DELETE | `/api/talhoes/{id}` | Edita / exclui (ADMIN) |
 | GET/POST/PUT/DELETE | `/api/veiculos[/{id}]` | Frota |
 | POST | `/api/iot/telemetria` | Ingestão do firmware (`X-Device-Key`) |
 | GET/POST | `/api/iot/dispositivos` | Painel / provisiona (ADMIN, devolve a chave) |
