@@ -29,6 +29,7 @@ public class TelemetriaService {
 	private final DispositivoRepository dispositivos;
 	private final LeituraRepository leituras;
 	private final AlertaRepository alertas;
+	private final GeofenceService geofence;
 
 	@Transactional
 	public TelemetriaResponse receber(TelemetriaRequest req, String apiKey) {
@@ -60,9 +61,15 @@ public class TelemetriaService {
 			if (maisRecente.getBateria() != null) {
 				dispositivo.setBateria(maisRecente.getBateria());
 			}
+			if (maisRecente.getLatitude() != null && maisRecente.getLongitude() != null) {
+				dispositivo.setLatitude(maisRecente.getLatitude());
+				dispositivo.setLongitude(maisRecente.getLongitude());
+			}
 			alertasGerados = gerarAlertas(dispositivo, maisRecente, agora);
 		}
-		return new TelemetriaResponse(novas.size(), lote.size() - novas.size(), alertasGerados);
+		List<Leitura> cronologicas = novas.stream().sorted(Comparator.comparing(Leitura::getMedidoEm)).toList();
+		int mudancas = geofence.processar(dispositivo, cronologicas);
+		return new TelemetriaResponse(novas.size(), lote.size() - novas.size(), alertasGerados, mudancas);
 	}
 
 	private int gerarAlertas(Dispositivo dispositivo, Leitura leitura, Instant agora) {
@@ -100,6 +107,12 @@ public class TelemetriaService {
 		l.setNivelPercentual(p.nivelPercentual());
 		l.setBateria(p.bateria());
 		l.setRssi(p.rssi());
+		// Receptor GNSS sem fix costuma enviar 0,0: trata como posição desconhecida.
+		boolean semFix = p.lat() == null || p.lon() == null || (p.lat() == 0 && p.lon() == 0);
+		l.setLatitude(semFix ? null : p.lat());
+		l.setLongitude(semFix ? null : p.lon());
+		l.setVelocidade(p.velocidade());
+		l.setOperando(p.operando());
 		return l;
 	}
 }

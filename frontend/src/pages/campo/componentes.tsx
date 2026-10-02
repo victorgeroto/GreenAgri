@@ -1,5 +1,5 @@
 import { clsx } from 'clsx'
-import { AlertOctagon, AlertTriangle, BatteryLow, BatteryMedium, BatteryFull, CloudSun, Droplets, Info, Warehouse, Wifi } from 'lucide-react'
+import { AlertOctagon, AlertTriangle, BatteryLow, BatteryMedium, BatteryFull, CloudSun, Droplets, Info, Navigation, Warehouse, Wifi } from 'lucide-react'
 import { Badge } from '@/components/ui'
 import { fmtNumero } from '@/lib/format'
 import type { Dispositivo, ReconciliacaoSilo, SeveridadeAlerta, TipoDispositivo } from '@/lib/types'
@@ -8,6 +8,7 @@ export const ICONE_TIPO: Record<TipoDispositivo, typeof CloudSun> = {
   ESTACAO_METEOROLOGICA: CloudSun,
   SENSOR_SOLO: Droplets,
   SENSOR_SILO: Warehouse,
+  RASTREADOR_MAQUINA: Navigation,
 }
 
 export function StatusOnline({ online }: { online: boolean }) {
@@ -105,14 +106,16 @@ export function ResumoLeitura({ d }: { d: Dispositivo }) {
       ? [['Temperatura', l.temperatura, '°C'], ['Umidade do ar', l.umidadeAr, '%']]
       : d.tipo === 'SENSOR_SOLO'
         ? [['Umidade do solo', l.umidadeSolo, '%'], ['Temp. do solo', l.temperatura, '°C']]
-        : [['Nível', l.nivelPercentual, '%'], ['Temp. da massa', l.temperatura, '°C']]
+        : d.tipo === 'SENSOR_SILO'
+          ? [['Nível', l.nivelPercentual, '%'], ['Temp. da massa', l.temperatura, '°C']]
+          : [['Velocidade', l.velocidade, 'km/h'], ['Implemento', l.operando ? 'Operando' : 'Desligado', '']]
   return (
     <dl className="grid grid-cols-2 gap-2">
       {itens.map(([label, valor, un]) => (
         <div key={label as string} className="rounded-xl bg-stone-50 p-2">
           <dt className="text-xs text-stone-500">{label}</dt>
           <dd className="text-lg font-semibold tabular-nums">
-            {valor == null ? '—' : `${fmtNumero(valor as number)} ${un}`}
+            {valor == null ? '—' : typeof valor === 'string' ? valor : `${fmtNumero(valor)} ${un}`}
           </dd>
         </div>
       ))}

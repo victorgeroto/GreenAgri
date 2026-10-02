@@ -104,11 +104,14 @@ class ApiIntegrationTest {
 	void concluirColheitaLancaProducaoNoEstoque() throws Exception {
 		long produtoId = criarProduto("TST-05", 0);
 		String colheita = """
-				{"talhao":"T-99","cultura":"Soja","areaHa":10,"dataPlantio":"2026-01-01",
+				{"talhaoId":%d,"cultura":"Soja","areaHa":10,"dataPlantio":"2026-01-01",
 				 "previsaoColheita":"2026-05-01","producaoEstimadaKg":30000,"produtoId":%d}
-				""".formatted(produtoId);
+				""".formatted(talhaoId("T-01"), produtoId);
 		JsonNode criada = json(mvc.perform(post("/api/colheitas").with(operador())
-			.contentType(MediaType.APPLICATION_JSON).content(colheita)).andExpect(status().isCreated()));
+			.contentType(MediaType.APPLICATION_JSON).content(colheita))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.safra").value("2025/26"))
+			.andExpect(jsonPath("$.status").value("PLANEJADA")));
 
 		mvc.perform(post("/api/colheitas/" + criada.get("id").asLong() + "/concluir").with(operador())
 			.contentType(MediaType.APPLICATION_JSON)
@@ -145,6 +148,97 @@ class ApiIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$[?(@.codigo == 'SILO-02')].silo.divergente").value(true))
 			.andExpect(jsonPath("$[?(@.codigo == 'SOLO-T05')].online").value(false));
+	}
+
+	@Test
+	void colheitadeiraOperandoNoTalhaoIniciaAColheita() throws Exception {
+		JsonNode t04 = talhao("T-04");
+		long trigo = colheitaAtiva("T-04").get("id").asLong();
+		long agora = System.currentTimeMillis() / 1000 + 60;
+		String lote = """
+				{"codigo":"RAST-CH01","leituras":[
+				  {"ts":%d,"lat":-24.8800,"lon":-53.5600,"vel":18,"op":false},
+				  {"ts":%d,"lat":%s,"lon":%s,"vel":6.5,"op":true}]}
+				""".formatted(agora - 30, agora, t04.get("latitude").asText(), t04.get("longitude").asText());
+
+		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "dev-key-rast-ch01")
+			.contentType(MediaType.APPLICATION_JSON).content(lote))
+			.andExpect(status().isAccepted())
+			.andExpect(jsonPath("$.mudancasStatus").value(1));
+
+		mvc.perform(get("/api/colheitas/" + trigo).with(operador()))
+			.andExpect(jsonPath("$.status").value("EM_COLHEITA"));
+		mvc.perform(get("/api/colheitas/" + trigo + "/eventos").with(operador()))
+			.andExpect(jsonPath("$[-1:].origem").value("DISPOSITIVO"))
+			.andExpect(jsonPath("$[-1:].statusAnterior").value("EM_DESENVOLVIMENTO"))
+			.andExpect(jsonPath("$[-1:].responsavel").value(org.hamcrest.Matchers.contains(containsString("CH-01"))));
+	}
+
+	@Test
+	void maquinaForaDosTalhoesNaoMudaStatus() throws Exception {
+		String lote = """
+				{"codigo":"RAST-CH01","leituras":[{"ts":%d,"lat":-24.8800,"lon":-53.5600,"vel":4,"op":true}]}
+				""".formatted(System.currentTimeMillis() / 1000 + 60);
+		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "dev-key-rast-ch01")
+			.contentType(MediaType.APPLICATION_JSON).content(lote))
+			.andExpect(jsonPath("$.mudancasStatus").value(0));
+	}
+
+	@Test
+	void talhaoComLavouraAtivaNaoAceitaOutra() throws Exception {
+		String colheita = """
+				{"talhaoId":%d,"cultura":"Soja","dataPlantio":"2026-09-01","previsaoColheita":"2027-01-20",
+				 "status":"EM_DESENVOLVIMENTO"}
+				""".formatted(talhaoId("T-02"));
+		mvc.perform(post("/api/colheitas").with(operador()).contentType(MediaType.APPLICATION_JSON).content(colheita))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.detail").value(containsString("ocupado por Milho safrinha")));
+	}
+
+	@Test
+	void statusSoAvanca() throws Exception {
+		long milho = colheitaAtiva("T-02").get("id").asLong();
+		mvc.perform(post("/api/colheitas/" + milho + "/status").with(operador())
+			.contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"PLANEJADA\"}"))
+			.andExpect(status().isUnprocessableEntity());
+		mvc.perform(post("/api/colheitas/" + milho + "/status").with(operador())
+			.contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"EM_COLHEITA\",\"observacao\":\"Início manual\"}"))
+			.andExpect(jsonPath("$.status").value("EM_COLHEITA"));
+	}
+
+	@Test
+	void separaColheitasPorSafraETalhoesTemArea() throws Exception {
+		mvc.perform(get("/api/colheitas/safras").with(operador()))
+			.andExpect(jsonPath("$", hasSize(3)));
+		mvc.perform(get("/api/colheitas").param("safra", "2024/25").with(operador()))
+			.andExpect(jsonPath("$", hasSize(1)))
+			.andExpect(jsonPath("$[0].talhao").value("T-05"));
+		mvc.perform(get("/api/talhoes").with(operador()))
+			.andExpect(jsonPath("$", hasSize(5)))
+			.andExpect(jsonPath("$[0].geometria.type").value("Polygon"))
+			.andExpect(jsonPath("$[0].areaHa").isNumber());
+	}
+
+	private JsonNode talhao(String codigo) throws Exception {
+		for (JsonNode t : json(mvc.perform(get("/api/talhoes").with(operador())))) {
+			if (t.get("codigo").asText().equals(codigo)) {
+				return t;
+			}
+		}
+		throw new AssertionError("Talhão não encontrado: " + codigo);
+	}
+
+	private long talhaoId(String codigo) throws Exception {
+		return talhao(codigo).get("id").asLong();
+	}
+
+	private JsonNode colheitaAtiva(String talhao) throws Exception {
+		for (JsonNode c : json(mvc.perform(get("/api/colheitas").with(operador())))) {
+			if (c.get("talhao").asText().equals(talhao) && c.get("status").asText().equals("EM_DESENVOLVIMENTO")) {
+				return c;
+			}
+		}
+		throw new AssertionError("Sem colheita ativa em " + talhao);
 	}
 
 	private long criarProduto(String sku, int saldoInicial) throws Exception {

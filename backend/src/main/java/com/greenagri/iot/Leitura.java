@@ -45,4 +45,14 @@ public class Leitura {
 	private Double bateria;
 
 	private Integer rssi;
+
+	private Double latitude;
+
+	private Double longitude;
+
+	/** km/h */
+	private Double velocidade;
+
+	/** Implemento em operação (ex.: plataforma de corte ligada). */
+	private Boolean operando;
 }

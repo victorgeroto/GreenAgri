@@ -71,7 +71,8 @@ export const TIPOS_MOVIMENTACAO: Record<TipoMovimentacao, string> = {
 
 export const STATUS_COLHEITA: Record<StatusColheita, string> = {
   PLANEJADA: 'Planejada',
-  EM_ANDAMENTO: 'Em andamento',
+  EM_DESENVOLVIMENTO: 'Em desenvolvimento',
+  EM_COLHEITA: 'Em colheita',
   CONCLUIDA: 'Concluída',
 }
 
@@ -95,6 +96,14 @@ export const TIPOS_DISPOSITIVO: Record<TipoDispositivo, string> = {
   ESTACAO_METEOROLOGICA: 'Estação meteorológica',
   SENSOR_SOLO: 'Sensor de solo',
   SENSOR_SILO: 'Sensor de silo',
+  RASTREADOR_MAQUINA: 'Rastreador de máquina',
 }
 
 export const fmtQtd = (n: number, unidade: Unidade) => `${fmtNumero(n)} ${UNIDADES[unidade]}`
+
+/** Ano-safra brasileiro (jul–jun), igual ao backend: plantio em ago/2025 → 2025/26. */
+export function safraDe(dataISO: string) {
+  const [ano, mes] = dataISO.split('-').map(Number)
+  const inicio = mes >= 7 ? ano : ano - 1
+  return `${inicio}/${String((inicio + 1) % 100).padStart(2, '0')}`
+}
