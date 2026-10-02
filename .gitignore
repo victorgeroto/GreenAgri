@@ -22,3 +22,7 @@ frontend/dev-dist/
 .settings/
 .factorypath
 .DS_Store
+
+# Firmware
+firmware/esp32-sensor/include/config.h
+firmware/esp32-sensor/.pio/
