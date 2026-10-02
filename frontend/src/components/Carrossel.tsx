@@ -79,6 +79,7 @@ export function Carrossel({ fotos = FOTOS_CAMPO, className, children, semLegenda
       ))}
       {/* Escurece a base para o texto ter contraste sobre qualquer foto. */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent" aria-hidden />
 
       <div className="relative flex h-full flex-col justify-end p-4 text-white sm:p-6">
         {children}

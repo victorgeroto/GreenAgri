@@ -90,8 +90,8 @@ function DispositivoCard({ d }: { d: Dispositivo }) {
     <Link to={`/campo/${d.id}`} className="group min-w-0">
       <Card className="flex h-full flex-col gap-3 transition-shadow group-hover:shadow-md">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <span className="rounded-md border border-stone-200 bg-white p-2 text-stone-600">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="shrink-0 rounded-md border border-stone-200 bg-white p-2 text-stone-600">
               <Icone className="h-5 w-5" aria-hidden />
             </span>
             <div className="min-w-0">
