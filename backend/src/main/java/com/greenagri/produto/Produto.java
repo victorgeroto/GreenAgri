@@ -47,6 +47,9 @@ public class Produto {
 
 	private String descricao;
 
+	/** Caminho público (/img/...) ou data URL JPEG gerada pelo app. */
+	private String imagem;
+
 	private Instant atualizadoEm;
 
 	public boolean abaixoDoMinimo() {
