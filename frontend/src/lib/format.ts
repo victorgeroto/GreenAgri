@@ -1,5 +1,9 @@
 import type {
   Categoria,
+  Funcao,
+  SituacaoOperador,
+  TipoAtividade,
+  Turno,
   StatusColheita,
   StatusVeiculo,
   TipoDispositivo,
@@ -107,3 +111,37 @@ export function safraDe(dataISO: string) {
   const inicio = mes >= 7 ? ano : ano - 1
   return `${inicio}/${String((inicio + 1) % 100).padStart(2, '0')}`
 }
+
+export const FUNCOES: Record<Funcao, string> = {
+  OPERADOR_MAQUINAS: 'Operador(a) de máquinas',
+  TRATORISTA: 'Tratorista',
+  MOTORISTA: 'Motorista',
+  MECANICO: 'Mecânico(a)',
+  TECNICO_AGRICOLA: 'Técnico(a) agrícola',
+  AUXILIAR_CAMPO: 'Auxiliar de campo',
+}
+
+export const TURNOS: Record<Turno, string> = {
+  MANHA: 'Manhã',
+  TARDE: 'Tarde',
+  INTEGRAL: 'Integral',
+  NOITE: 'Noite',
+}
+
+export const ATIVIDADES: Record<TipoAtividade, string> = {
+  COLHEITA: 'Colheita',
+  PLANTIO: 'Plantio',
+  PULVERIZACAO: 'Pulverização',
+  ADUBACAO: 'Adubação',
+  TRANSPORTE: 'Transporte',
+  MANUTENCAO: 'Manutenção',
+  OUTRA: 'Outra atividade',
+}
+
+export const SITUACOES: Record<SituacaoOperador, string> = {
+  DISPONIVEL: 'Disponível',
+  EM_ATIVIDADE: 'Em atividade',
+  AUSENTE: 'Ausente',
+}
+
+export const fmtHora = (iso?: string) => (iso ? new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '—')

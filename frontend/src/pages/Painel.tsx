@@ -8,9 +8,10 @@ import { ImagemProduto } from '@/components/ImagemProduto'
 import { FAZENDA } from '@/components/Layout'
 import { Badge, Button, Carregando, Erro, Indicador, Indicadores, PageHeader, Painel as Bloco } from '@/components/ui'
 import { diasAte, fmtData, fmtNumero, fmtQtd, fmtRelativo, hojeISO, safraDe, STATUS_COLHEITA } from '@/lib/format'
-import type { Colheita, Dispositivo, ResumoDashboard } from '@/lib/types'
+import type { Colheita, Dispositivo, Operador, ResumoDashboard } from '@/lib/types'
 import { useDados } from '@/offline/hooks'
 import { Reconciliacao } from './campo/componentes'
+import { Avatar, resumoAtividade } from './equipe/componentes'
 import { useProdutos } from './estoque/hooks'
 import { MovimentacaoItem } from './estoque/MovimentacaoItem'
 import { MovimentarSheet } from './estoque/MovimentarSheet'
@@ -40,6 +41,7 @@ export default function Painel() {
   const { data: r, isLoading, error, refetch } = useDados<ResumoDashboard>('/dashboard', { refetchInterval: 60_000 })
   const { data: dispositivos = [] } = useDados<Dispositivo[]>('/iot/dispositivos', { refetchInterval: 60_000 })
   const { data: colheitas = [] } = useDados<Colheita[]>('/colheitas')
+  const { data: equipe = [] } = useDados<Operador[]>('/equipe/operadores', { refetchInterval: 60_000 })
   const { produtos } = useProdutos()
   const [lancando, setLancando] = useState(false)
 
@@ -167,6 +169,26 @@ export default function Painel() {
                 </li>
               )
             })}
+          </ul>
+        </Bloco>
+
+        <Bloco
+          className="lg:col-span-3"
+          titulo="Equipe hoje"
+          descricao={`${r.operadoresDisponiveis} disponíveis · ${r.operadoresEmAtividade} em atividade · ${r.operadores - r.operadoresDisponiveis - r.operadoresEmAtividade} ausentes`}
+          acao={<VerTudo to="/equipe">Alocar equipe</VerTudo>}
+          semPadding
+        >
+          <ul className="grid divide-y divide-stone-100 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-3">
+            {equipe.filter((o) => o.alocacaoAtual).map((o) => (
+              <li key={o.id} className="flex items-center gap-3 px-4 py-3">
+                <Avatar nome={o.nome} situacao={o.situacao} />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-stone-800">{o.nome}</p>
+                  <p className="truncate text-xs text-stone-500">{resumoAtividade(o.alocacaoAtual!)}</p>
+                </div>
+              </li>
+            ))}
           </ul>
         </Bloco>
       </div>
