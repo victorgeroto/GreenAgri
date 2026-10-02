@@ -1,0 +1,6 @@
+[
+  { "sku": "GR-SOJA-01", "tipo": "SAIDA", "quantidade": 1200, "motivo": "Venda - trading (contrato 3107)", "diasAtras": 14 },
+  { "sku": "GR-MILHO-01", "tipo": "SAIDA", "quantidade": 800, "motivo": "Venda - fábrica de ração", "diasAtras": 6 },
+  { "sku": "CB-DIESEL-01", "tipo": "SAIDA", "quantidade": 1800, "motivo": "Abastecimento pulverizador BV-PV01", "diasAtras": 2 },
+  { "sku": "DF-FUNG-02", "tipo": "SAIDA", "quantidade": 35, "motivo": "Aplicação no pivô P-01", "diasAtras": 1 }
+]

@@ -28,7 +28,7 @@ import com.greenagri.talhao.Talhao;
 
 import lombok.RequiredArgsConstructor;
 
-/** Carrega a equipe fictícia de {@code seed/operadores.json}; chamado pelo {@link DataSeeder}. */
+/** Carrega a equipe fictícia de {@code seed/<fazenda>/operadores.json}; chamado pelo {@link DataSeeder}. */
 @Component
 @RequiredArgsConstructor
 class EquipeSeed {
@@ -45,9 +45,13 @@ class EquipeSeed {
 			List<TipoVeiculo> habilitacoes, Integer ausenteDias, String motivoAusencia, AlocacaoSeed alocacao) {
 	}
 
-	int carregar(Map<String, Veiculo> veiculos, Map<String, Talhao> talhoes) throws IOException {
+	int carregar(String pasta, Map<String, Veiculo> veiculos, Map<String, Talhao> talhoes) throws IOException {
+		ClassPathResource arquivo = new ClassPathResource("seed/" + pasta + "/operadores.json");
+		if (!arquivo.exists()) {
+			return 0;
+		}
 		List<OperadorSeed> lista;
-		try (InputStream in = new ClassPathResource("seed/operadores.json").getInputStream()) {
+		try (InputStream in = arquivo.getInputStream()) {
 			lista = mapper.readValue(in, new TypeReference<List<OperadorSeed>>() { });
 		}
 		Instant agora = Instant.now();

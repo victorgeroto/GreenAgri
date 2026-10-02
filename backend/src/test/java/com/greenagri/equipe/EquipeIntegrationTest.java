@@ -1,7 +1,6 @@
 package com.greenagri.equipe;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -14,20 +13,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.greenagri.Acesso;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greenagri.fazenda.FazendaDoTesteListener;
 
 /** Regras de alocação da equipe sobre os dados de demonstração (seed/operadores.json). */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
 @Transactional
+@TestExecutionListeners(listeners = FazendaDoTesteListener.class, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 class EquipeIntegrationTest {
 
 	@Autowired
@@ -36,8 +40,8 @@ class EquipeIntegrationTest {
 	@Autowired
 	ObjectMapper mapper;
 
-	private static JwtRequestPostProcessor operador() {
-		return jwt().jwt(j -> j.claim("nome", "Encarregado").claim("perfil", "OPERADOR"));
+	private static RequestPostProcessor operador() {
+		return Acesso.operador();
 	}
 
 	@Test

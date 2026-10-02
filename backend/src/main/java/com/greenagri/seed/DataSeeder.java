@@ -1,6 +1,7 @@
 package com.greenagri.seed;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -19,7 +21,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +35,9 @@ import com.greenagri.colheita.ColheitaService;
 import com.greenagri.colheita.Safra;
 import com.greenagri.colheita.StatusColheita;
 import com.greenagri.estoque.EstoqueService;
+import com.greenagri.fazenda.ContextoFazenda;
+import com.greenagri.fazenda.Fazenda;
+import com.greenagri.fazenda.FazendaRepository;
 import com.greenagri.estoque.TipoMovimentacao;
 import com.greenagri.frota.StatusVeiculo;
 import com.greenagri.frota.TipoVeiculo;
@@ -58,8 +64,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Carrega os dados de demonstração de {@code classpath:seed/*.json} e gera
- * um histórico de 72 h de telemetria. Só roda com {@code greenagri.seed.enabled=true}
+ * Carrega os dados de demonstração: fazendas e usuários de {@code classpath:seed/*.json}
+ * e os dados de cada fazenda de {@code seed/<codigo-da-fazenda>/*.json}, com um
+ * histórico de 72 h de telemetria. Só roda com {@code greenagri.seed.enabled=true}
  * e em banco vazio.
  */
 @Slf4j
@@ -86,10 +93,18 @@ public class DataSeeder implements ApplicationRunner {
 	private final LeituraRepository leituras;
 	private final TelemetriaService telemetriaService;
 	private final EquipeSeed equipeSeed;
+	private final FazendaRepository fazendas;
+	private final PlatformTransactionManager transactionManager;
+
+	/** Pasta da fazenda sendo carregada (seed/<pasta>/). */
+	private String pasta;
 
 	private final Random random = new Random(42);
 
-	record UsuarioSeed(String nome, String email, String senha, Perfil perfil) {
+	record UsuarioSeed(String nome, String email, String senha, Perfil perfil, List<String> fazendas) {
+	}
+
+	record FazendaSeed(String codigo, String nome, String municipio, String uf, Double latitude, Double longitude) {
 	}
 
 	record ProdutoSeed(String sku, String nome, Categoria categoria, Unidade unidade, BigDecimal estoqueMinimo,
@@ -119,24 +134,65 @@ public class DataSeeder implements ApplicationRunner {
 	}
 
 	@Override
-	@Transactional
-	public void run(ApplicationArguments args) throws IOException {
+	public void run(ApplicationArguments args) {
 		if (usuarios.count() > 0) {
 			log.info("Banco já possui dados; carga de demonstração ignorada");
 			return;
 		}
-		ler("usuarios", new TypeReference<List<UsuarioSeed>>() { })
-			.forEach(u -> usuarios.save(new Usuario(u.nome(), u.email(), passwordEncoder.encode(u.senha()), u.perfil())));
+		TransactionTemplate tx = new TransactionTemplate(transactionManager);
+		// Fazendas e usuários não pertencem a uma fazenda: são gravados em modo raiz.
+		Map<String, Fazenda> criadas = tx.execute(s -> criarFazendasEUsuarios());
+		// Cada fazenda numa transação própria, com ela selecionada: o Hibernate preenche o fazenda_id.
+		criadas.forEach((codigo, fazenda) -> ContextoFazenda.executar(fazenda.getId(),
+				() -> tx.executeWithoutResult(s -> carregarFazenda(codigo, fazenda))));
+	}
 
+	private Map<String, Fazenda> criarFazendasEUsuarios() {
+		try {
+			Map<String, Fazenda> porCodigo = new LinkedHashMap<>();
+			for (FazendaSeed s : ler("fazendas", new TypeReference<List<FazendaSeed>>() { })) {
+				Fazenda f = new Fazenda();
+				f.setNome(s.nome());
+				f.setMunicipio(s.municipio());
+				f.setUf(s.uf());
+				f.setLatitude(s.latitude());
+				f.setLongitude(s.longitude());
+				porCodigo.put(s.codigo(), fazendas.save(f));
+			}
+			for (UsuarioSeed u : ler("usuarios", new TypeReference<List<UsuarioSeed>>() { })) {
+				Usuario usuario = usuarios.save(new Usuario(u.nome(), u.email(), passwordEncoder.encode(u.senha()), u.perfil()));
+				u.fazendas().forEach(codigo -> porCodigo.get(codigo).getMembros().add(usuario));
+			}
+			return porCodigo;
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private void carregarFazenda(String codigo, Fazenda fazenda) {
+		pasta = codigo;
+		try {
+			carregarDados(fazenda);
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		finally {
+			pasta = null;
+		}
+	}
+
+	private void carregarDados(Fazenda fazenda) throws IOException {
 		Map<String, Produto> porSku = carregarProdutos();
 		carregarMovimentacoes(porSku);
 		Map<String, Talhao> porCodigo = carregarTalhoes();
 		carregarColheitas(porSku, porCodigo);
 		Map<String, Veiculo> porIdentificacao = carregarVeiculos();
 		carregarDispositivos(porSku, porIdentificacao);
-		int equipe = equipeSeed.carregar(porIdentificacao, porCodigo);
-		log.info("Dados de demonstração carregados: {} produtos, {} talhões, {} dispositivos, {} operadores",
-				porSku.size(), porCodigo.size(), dispositivos.count(), equipe);
+		int equipe = equipeSeed.carregar(pasta, porIdentificacao, porCodigo);
+		log.info("Dados de demonstração carregados em {}: {} produtos, {} talhões, {} dispositivos, {} operadores",
+				fazenda.getNome(), porSku.size(), porCodigo.size(), dispositivos.count(), equipe);
 	}
 
 	private Map<String, Produto> carregarProdutos() throws IOException {
@@ -334,8 +390,13 @@ public class DataSeeder implements ApplicationRunner {
 		return l;
 	}
 
+	/** Lê seed/<nome>.json (ou seed/<pasta>/<nome>.json); arquivo ausente equivale a lista vazia. */
 	private <T> List<T> ler(String nome, TypeReference<List<T>> tipo) throws IOException {
-		try (InputStream in = new ClassPathResource("seed/" + nome + ".json").getInputStream()) {
+		ClassPathResource arquivo = new ClassPathResource("seed/" + (pasta == null ? "" : pasta + "/") + nome + ".json");
+		if (!arquivo.exists()) {
+			return List.of();
+		}
+		try (InputStream in = arquivo.getInputStream()) {
 			return mapper.readValue(in, tipo);
 		}
 	}

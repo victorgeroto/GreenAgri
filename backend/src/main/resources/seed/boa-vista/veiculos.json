@@ -1,0 +1,5 @@
+[
+  { "identificacao": "BV-TR01", "modelo": "John Deere 8R 340", "tipo": "TRATOR", "ano": 2022, "horimetro": 2310, "status": "DISPONIVEL", "diasManutencao": 40 },
+  { "identificacao": "BV-PV01", "modelo": "Case Patriot 350", "tipo": "PULVERIZADOR", "ano": 2021, "horimetro": 3120, "status": "DISPONIVEL", "diasManutencao": 6 },
+  { "identificacao": "BV-CH01", "modelo": "Case Axial-Flow 8250", "tipo": "COLHEITADEIRA", "ano": 2023, "horimetro": 905, "status": "DISPONIVEL", "diasManutencao": 120, "observacoes": "Preparada para a colheita do feijão" }
+]
