@@ -50,6 +50,6 @@ class ReconciliacaoSiloTest {
 	}
 
 	private static LeituraResponse nivel(double percentual) {
-		return new LeituraResponse(null, 24.0, null, null, percentual, 100.0, -70);
+		return new LeituraResponse(null, 24.0, null, null, percentual, 100.0, -70, null, null, null, null);
 	}
 }

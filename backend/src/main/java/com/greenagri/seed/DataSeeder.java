@@ -28,6 +28,8 @@ import com.greenagri.auth.Usuario;
 import com.greenagri.auth.UsuarioRepository;
 import com.greenagri.colheita.Colheita;
 import com.greenagri.colheita.ColheitaRepository;
+import com.greenagri.colheita.ColheitaService;
+import com.greenagri.colheita.Safra;
 import com.greenagri.colheita.StatusColheita;
 import com.greenagri.estoque.EstoqueService;
 import com.greenagri.estoque.TipoMovimentacao;
@@ -48,6 +50,9 @@ import com.greenagri.produto.Categoria;
 import com.greenagri.produto.Produto;
 import com.greenagri.produto.ProdutoRepository;
 import com.greenagri.produto.Unidade;
+import com.greenagri.talhao.Talhao;
+import com.greenagri.talhao.TalhaoDtos.TalhaoRequest;
+import com.greenagri.talhao.TalhaoService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +79,8 @@ public class DataSeeder implements ApplicationRunner {
 	private final ProdutoRepository produtos;
 	private final EstoqueService estoqueService;
 	private final ColheitaRepository colheitas;
+	private final ColheitaService colheitaService;
+	private final TalhaoService talhaoService;
 	private final VeiculoRepository veiculos;
 	private final DispositivoRepository dispositivos;
 	private final LeituraRepository leituras;
@@ -91,7 +98,7 @@ public class DataSeeder implements ApplicationRunner {
 	record MovimentacaoSeed(String sku, TipoMovimentacao tipo, BigDecimal quantidade, String motivo, int diasAtras) {
 	}
 
-	record ColheitaSeed(String talhao, String cultura, BigDecimal areaHa, int diasPlantio, int diasPrevisao,
+	record ColheitaSeed(String talhao, String cultura, int diasPlantio, int diasPrevisao,
 			BigDecimal producaoEstimadaKg, StatusColheita status, Integer diasColheita, BigDecimal producaoRealKg,
 			String produtoSku, String observacoes) {
 	}
@@ -107,7 +114,7 @@ public class DataSeeder implements ApplicationRunner {
 
 	record DispositivoSeed(String codigo, String nome, TipoDispositivo tipo, String localizacao, Double latitude,
 			Double longitude, String apiKey, String firmware, String produtoSku, BigDecimal capacidadeKg,
-			Simulacao simulacao) {
+			String veiculo, Simulacao simulacao) {
 	}
 
 	@Override
@@ -122,10 +129,12 @@ public class DataSeeder implements ApplicationRunner {
 
 		Map<String, Produto> porSku = carregarProdutos();
 		carregarMovimentacoes(porSku);
-		carregarColheitas(porSku);
-		carregarVeiculos();
-		carregarDispositivos(porSku);
-		log.info("Dados de demonstração carregados: {} produtos, {} dispositivos", porSku.size(), dispositivos.count());
+		Map<String, Talhao> porCodigo = carregarTalhoes();
+		carregarColheitas(porSku, porCodigo);
+		Map<String, Veiculo> porIdentificacao = carregarVeiculos();
+		carregarDispositivos(porSku, porIdentificacao);
+		log.info("Dados de demonstração carregados: {} produtos, {} talhões, {} dispositivos", porSku.size(),
+				porCodigo.size(), dispositivos.count());
 	}
 
 	private Map<String, Produto> carregarProdutos() throws IOException {
@@ -156,26 +165,55 @@ public class DataSeeder implements ApplicationRunner {
 		}
 	}
 
-	private void carregarColheitas(Map<String, Produto> porSku) throws IOException {
+	private Map<String, Talhao> carregarTalhoes() throws IOException {
+		Map<String, Talhao> porCodigo = new HashMap<>();
+		for (TalhaoRequest s : ler("talhoes", new TypeReference<List<TalhaoRequest>>() { })) {
+			Talhao t = talhaoService.criar(s);
+			porCodigo.put(t.getCodigo(), t);
+		}
+		return porCodigo;
+	}
+
+	/** Cria as colheitas e reconstrói o histórico de status com datas coerentes com o ciclo. */
+	private void carregarColheitas(Map<String, Produto> porSku, Map<String, Talhao> porCodigo) throws IOException {
 		LocalDate hoje = LocalDate.now();
 		for (ColheitaSeed s : ler("colheitas", new TypeReference<List<ColheitaSeed>>() { })) {
+			Talhao talhao = porCodigo.get(s.talhao());
 			Colheita c = new Colheita();
-			c.setTalhao(s.talhao());
+			c.setTalhao(talhao);
 			c.setCultura(s.cultura());
-			c.setAreaHa(s.areaHa());
+			c.setAreaHa(talhao.getAreaHa());
 			c.setDataPlantio(hoje.plusDays(s.diasPlantio()));
+			c.setSafra(Safra.de(c.getDataPlantio()));
 			c.setPrevisaoColheita(hoje.plusDays(s.diasPrevisao()));
 			c.setDataColheita(s.diasColheita() == null ? null : hoje.plusDays(s.diasColheita()));
 			c.setProducaoEstimadaKg(s.producaoEstimadaKg());
 			c.setProducaoRealKg(s.producaoRealKg());
-			c.setStatus(s.status());
 			c.setProduto(s.produtoSku() == null ? null : porSku.get(s.produtoSku()));
 			c.setObservacoes(s.observacoes());
 			colheitas.save(c);
+
+			colheitaService.importarStatus(c, null, StatusColheita.PLANEJADA, RESPONSAVEL,
+					manha(c.getDataPlantio().minusDays(25)));
+			if (s.status().ordinal() >= StatusColheita.EM_DESENVOLVIMENTO.ordinal()) {
+				colheitaService.importarStatus(c, StatusColheita.PLANEJADA, StatusColheita.EM_DESENVOLVIMENTO,
+						RESPONSAVEL, manha(c.getDataPlantio()));
+			}
+			if (s.status() == StatusColheita.CONCLUIDA) {
+				colheitaService.importarStatus(c, StatusColheita.EM_DESENVOLVIMENTO, StatusColheita.EM_COLHEITA,
+						RESPONSAVEL, manha(c.getDataColheita().minusDays(3)));
+				colheitaService.importarStatus(c, StatusColheita.EM_COLHEITA, StatusColheita.CONCLUIDA, RESPONSAVEL,
+						manha(c.getDataColheita()).plus(Duration.ofHours(9)));
+			}
 		}
 	}
 
-	private void carregarVeiculos() throws IOException {
+	private static Instant manha(LocalDate data) {
+		return data.atTime(8, 0).atZone(FUSO).toInstant();
+	}
+
+	private Map<String, Veiculo> carregarVeiculos() throws IOException {
+		Map<String, Veiculo> porIdentificacao = new HashMap<>();
 		LocalDate hoje = LocalDate.now();
 		for (VeiculoSeed s : ler("veiculos", new TypeReference<List<VeiculoSeed>>() { })) {
 			Veiculo v = new Veiculo();
@@ -188,10 +226,13 @@ public class DataSeeder implements ApplicationRunner {
 			v.setProximaManutencao(s.diasManutencao() == null ? null : hoje.plusDays(s.diasManutencao()));
 			v.setObservacoes(s.observacoes());
 			veiculos.save(v);
+			porIdentificacao.put(v.getIdentificacao(), v);
 		}
+		return porIdentificacao;
 	}
 
-	private void carregarDispositivos(Map<String, Produto> porSku) throws IOException {
+	private void carregarDispositivos(Map<String, Produto> porSku, Map<String, Veiculo> porIdentificacao)
+			throws IOException {
 		Instant agora = Instant.now();
 		for (DispositivoSeed s : ler("dispositivos", new TypeReference<List<DispositivoSeed>>() { })) {
 			Dispositivo d = new Dispositivo();
@@ -205,6 +246,7 @@ public class DataSeeder implements ApplicationRunner {
 			d.setFirmwareVersao(s.firmware());
 			d.setProduto(s.produtoSku() == null ? null : porSku.get(s.produtoSku()));
 			d.setCapacidadeKg(s.capacidadeKg());
+			d.setVeiculo(s.veiculo() == null ? null : porIdentificacao.get(s.veiculo()));
 			dispositivos.save(d);
 
 			Simulacao sim = s.simulacao();
@@ -243,19 +285,24 @@ public class DataSeeder implements ApplicationRunner {
 			case ESTACAO_METEOROLOGICA -> {
 				double temp = sim.temperaturaMedia() + sim.amplitude() * ciclo + ruido(0.6);
 				double ur = Math.clamp(sim.umidadeAr() - 2.5 * (temp - sim.temperaturaMedia()) + ruido(2), 15, 100);
-				yield new LeituraPayload(ts, arredondar(temp), arredondar(ur), null, null, bateria, rssi);
+				yield new LeituraPayload(ts, arredondar(temp), arredondar(ur), null, null, bateria, rssi, null, null,
+						null, null);
 			}
 			case SENSOR_SOLO -> {
 				double solo = interpolar(sim.umidadeSoloInicial(), sim.umidadeSoloFinal(), progresso) + ruido(0.4);
 				double temp = 21 + 3 * ciclo + ruido(0.3);
-				yield new LeituraPayload(ts, arredondar(temp), null, arredondar(solo), null, bateria, rssi);
+				yield new LeituraPayload(ts, arredondar(temp), null, arredondar(solo), null, bateria, rssi, null, null,
+						null, null);
 			}
 			case SENSOR_SILO -> {
 				double temp = interpolar(sim.temperaturaInicial(), sim.temperaturaFinal(), progresso * progresso)
 						+ ruido(0.15);
 				yield new LeituraPayload(ts, arredondar(temp), null, null, arredondar(nivelSilo(d, sim) + ruido(0.2)),
-						bateria, rssi);
+						bateria, rssi, null, null, null, null);
 			}
+			// Máquina estacionada no galpão: posição com o ruído típico de um GNSS comum (~2 m).
+			case RASTREADOR_MAQUINA -> new LeituraPayload(ts, null, null, null, null, bateria, rssi,
+					d.getLatitude() + ruido(0.00002), d.getLongitude() + ruido(0.00002), 0.0, false);
 		};
 	}
 
@@ -277,6 +324,10 @@ public class DataSeeder implements ApplicationRunner {
 		l.setNivelPercentual(p.nivelPercentual());
 		l.setBateria(p.bateria());
 		l.setRssi(p.rssi());
+		l.setLatitude(p.lat());
+		l.setLongitude(p.lon());
+		l.setVelocidade(p.velocidade());
+		l.setOperando(p.operando());
 		return l;
 	}
 
