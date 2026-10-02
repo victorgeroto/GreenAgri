@@ -1,4 +1,6 @@
-# GreenAgri
+<h1 align="center">
+  <img src="docs/img/logo.png" width="340" alt="GreenAgri">
+</h1>
 
 **Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e receba alertas dos sensores instalados no campo, tudo num só app.
 
