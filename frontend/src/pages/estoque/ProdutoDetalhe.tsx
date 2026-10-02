@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/auth/AuthContext'
-import { Badge, Barra, Button, Card, Carregando, Vazio } from '@/components/ui'
+import { ImagemProduto } from '@/components/ImagemProduto'
+import { Badge, Barra, Button, Card, Carregando, Painel, Vazio } from '@/components/ui'
 import { useToast } from '@/components/Toast'
 import { api } from '@/lib/api'
 import { CATEGORIAS, fmtDataHora, fmtQtd } from '@/lib/format'
@@ -49,6 +50,7 @@ export default function ProdutoDetalhe() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="space-y-4 lg:col-span-1">
+          <ImagemProduto key={p.imagem ?? 'sem'} produto={p} tamanho="lg" />
           <div>
             <div className="mb-1 flex items-center gap-2">
               <Badge>{CATEGORIAS[p.categoria]}</Badge>
@@ -58,7 +60,7 @@ export default function ProdutoDetalhe() {
             <p className="text-sm text-stone-500">{p.sku}</p>
           </div>
           <div>
-            <p className="text-3xl font-semibold tabular-nums">{fmtQtd(p.quantidadeAtual, p.unidade)}</p>
+            <p className="text-2xl font-semibold tabular-nums tracking-tight">{fmtQtd(p.quantidadeAtual, p.unidade)}</p>
             <div className="mt-2">
               <Barra valor={p.quantidadeAtual} max={Math.max(p.estoqueMinimo * 3, p.quantidadeAtual, 1)} marcador={p.estoqueMinimo} tom={p.abaixoDoMinimo ? 'vermelho' : 'verde'} />
             </div>
@@ -78,8 +80,7 @@ export default function ProdutoDetalhe() {
           </div>
         </Card>
 
-        <Card className="lg:col-span-2">
-          <h2 className="mb-1 font-semibold">Histórico</h2>
+        <Painel className="self-start lg:col-span-2" titulo="Histórico de movimentações" descricao="Cada linha mostra o saldo resultante após o lançamento">
           {historico.isLoading ? (
             <Carregando />
           ) : historico.linhas.length === 0 ? (
@@ -91,7 +92,7 @@ export default function ProdutoDetalhe() {
               ))}
             </ul>
           )}
-        </Card>
+        </Painel>
       </div>
 
       <MovimentarSheet aberto={movimentando} onFechar={() => setMovimentando(false)} produtos={produtos} produtoInicial={p} />

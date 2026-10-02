@@ -114,7 +114,7 @@ export function ColheitaSheet({ aberto, onFechar, colheita, talhoes, produtos, t
           </Field>
         )}
         <Field label="Observações">{(id) => <Textarea id={id} value={f.observacoes ?? ''} onChange={(e) => set('observacoes', e.target.value)} maxLength={500} />}</Field>
-        {erro && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+        {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
         <Button type="submit" className="w-full" carregando={salvar.isPending}>Salvar</Button>
       </form>
     </Sheet>
@@ -168,7 +168,7 @@ export function ConcluirSheet({ colheita, onFechar }: { colheita?: Colheita; onF
           <Field label="Produção total (kg)" dica={sacasHa ? `≈ ${fmtNumero(Math.round(sacasHa * 10) / 10)} sacas/ha` : undefined}>
             {(id) => <Input id={id} type="number" min={1} step="any" inputMode="decimal" value={kg} onChange={(e) => setKg(e.target.value)} required />}
           </Field>
-          {erro && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+          {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
           <Button type="submit" className="w-full" icon={CheckCircle2} carregando={concluir.isPending}>Concluir</Button>
         </form>
       )}
@@ -228,14 +228,14 @@ export function TalhaoSheet({ pontos, onFechar, onSalvo }: { pontos: LatLng[] | 
     <Sheet aberto={!!pontos} onFechar={onFechar} titulo="Novo talhão">
       {pontos && (
         <form onSubmit={enviar} className="space-y-4">
-          <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm text-brand-900">
+          <p className="rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-900">
             {pontos.length} vértices · área calculada de <strong>{fmtNumero(Math.round(areaHa(pontos) * 100) / 100)} ha</strong>
           </p>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Código">{(id) => <Input id={id} value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase())} required maxLength={20} placeholder="T-06" />}</Field>
             <Field label="Nome">{(id) => <Input id={id} value={nome} onChange={(e) => setNome(e.target.value)} required maxLength={120} placeholder="Talhão do Ipê" />}</Field>
           </div>
-          {erro && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+          {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
           <Button type="submit" className="w-full" carregando={salvar.isPending}>Salvar talhão</Button>
         </form>
       )}

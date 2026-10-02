@@ -4,16 +4,20 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Verde floresta sóbrio: primário em ações e navegação, nunca como fundo de página.
         brand: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
+          50: '#f1f6f2',
+          100: '#dfece3',
+          200: '#bfd9c7',
+          300: '#93bfa1',
+          500: '#3d8559',
+          600: '#2c6c45',
+          700: '#235737',
+          800: '#1b452c',
+          900: '#143521',
+          950: '#0b1f14',
         },
+        canvas: '#f5f5f3',
         solo: {
           50: '#faf7f2',
           100: '#f3ece0',
@@ -21,7 +25,11 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['"Inter Variable"', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
+      boxShadow: {
+        card: '0 1px 2px 0 rgb(28 25 23 / 0.04)',
+        pop: '0 8px 24px -6px rgb(28 25 23 / 0.18), 0 2px 6px -2px rgb(28 25 23 / 0.08)',
       },
     },
   },

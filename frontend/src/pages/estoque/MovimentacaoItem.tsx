@@ -5,16 +5,16 @@ import { fmtDataHora, fmtQtd, TIPOS_MOVIMENTACAO } from '@/lib/format'
 import type { Movimentacao } from '@/lib/types'
 
 const estilo = {
-  ENTRADA: { icon: ArrowDownLeft, cor: 'bg-brand-100 text-brand-700', sinal: '+' },
-  SAIDA: { icon: ArrowUpRight, cor: 'bg-orange-100 text-orange-700', sinal: '−' },
-  AJUSTE: { icon: ClipboardCheck, cor: 'bg-sky-100 text-sky-700', sinal: '=' },
+  ENTRADA: { icon: ArrowDownLeft, cor: 'text-brand-700', sinal: '+' },
+  SAIDA: { icon: ArrowUpRight, cor: 'text-orange-700', sinal: '−' },
+  AJUSTE: { icon: ClipboardCheck, cor: 'text-sky-700', sinal: '=' },
 }
 
 export function MovimentacaoItem({ m, mostrarProduto = true }: { m: Movimentacao; mostrarProduto?: boolean }) {
   const { icon: Icon, cor, sinal } = estilo[m.tipo]
   return (
-    <li className={clsx('flex items-start gap-3 py-3', m.pendente && 'opacity-80')}>
-      <span className={clsx('mt-0.5 rounded-xl p-2', cor)}>
+    <li className={clsx('flex items-start gap-3 py-2.5', m.pendente && 'opacity-80')}>
+      <span className={clsx('mt-0.5 rounded-md border border-stone-200 bg-white p-1.5', cor)}>
         <Icon className="h-4 w-4" aria-hidden />
       </span>
       <div className="min-w-0 flex-1">

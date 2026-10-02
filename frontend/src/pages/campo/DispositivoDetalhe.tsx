@@ -57,7 +57,7 @@ function Tabela({ tipo, leituras }: { tipo: Dispositivo['tipo']; leituras: Leitu
   const colunas: [string, (l: Leitura) => number | boolean | undefined][] = [...COLUNAS[tipo], ['Bateria (%)', (l) => l.bateria], ['RSSI (dBm)', (l) => l.rssi]]
   const linhas = [...leituras].reverse().slice(0, 100)
   return (
-    <div className="overflow-x-auto rounded-2xl border border-stone-200 bg-white lg:col-span-2">
+    <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white lg:col-span-2">
       <table className="w-full text-sm">
         <thead className="bg-stone-50 text-left text-xs text-stone-500">
           <tr>
@@ -103,7 +103,7 @@ export default function DispositivoDetalhe() {
 
       <Card className="mb-4 flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="rounded-xl bg-sky-50 p-3 text-sky-700">
+          <span className="rounded-md border border-stone-200 bg-white p-2.5 text-stone-600">
             <Icone className="h-6 w-6" aria-hidden />
           </span>
           <div>
@@ -140,7 +140,7 @@ export default function DispositivoDetalhe() {
         <div className="w-48">
           <Segmentado<Periodo> valor={periodo} onChange={setPeriodo} opcoes={[{ valor: '24', label: '24 h' }, { valor: '72', label: '72 h' }]} />
         </div>
-        <div className="flex rounded-xl bg-stone-100 p-1">
+        <div className="flex rounded-md bg-stone-100 p-1">
           {([['grafico', LineChart, 'Gráfico'], ['tabela', Table2, 'Tabela']] as const).map(([v, Icon, label]) => (
             <button
               key={v}
@@ -169,7 +169,7 @@ export default function DispositivoDetalhe() {
         <p className="mb-2 text-xs text-stone-500">
           O dispositivo envia lotes com chaves curtas para economizar banda. Exemplo do payload deste sensor:
         </p>
-        <pre className="overflow-x-auto rounded-xl bg-stone-900 p-3 text-xs leading-relaxed text-stone-100">
+        <pre className="overflow-x-auto rounded-md bg-stone-900 p-3 text-xs leading-relaxed text-stone-100">
 {`POST /api/iot/telemetria
 X-Device-Key: <chave do dispositivo>
 
