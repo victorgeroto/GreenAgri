@@ -85,6 +85,7 @@ public class DataSeeder implements ApplicationRunner {
 	private final DispositivoRepository dispositivos;
 	private final LeituraRepository leituras;
 	private final TelemetriaService telemetriaService;
+	private final EquipeSeed equipeSeed;
 
 	private final Random random = new Random(42);
 
@@ -133,8 +134,9 @@ public class DataSeeder implements ApplicationRunner {
 		carregarColheitas(porSku, porCodigo);
 		Map<String, Veiculo> porIdentificacao = carregarVeiculos();
 		carregarDispositivos(porSku, porIdentificacao);
-		log.info("Dados de demonstração carregados: {} produtos, {} talhões, {} dispositivos", porSku.size(),
-				porCodigo.size(), dispositivos.count());
+		int equipe = equipeSeed.carregar(porIdentificacao, porCodigo);
+		log.info("Dados de demonstração carregados: {} produtos, {} talhões, {} dispositivos, {} operadores",
+				porSku.size(), porCodigo.size(), dispositivos.count(), equipe);
 	}
 
 	private Map<String, Produto> carregarProdutos() throws IOException {

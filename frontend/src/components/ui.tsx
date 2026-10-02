@@ -271,7 +271,7 @@ export function Barra({ valor, max, marcador, tom = 'verde', className }: { valo
 
 export function Segmentado<T extends string>({ opcoes, valor, onChange }: { opcoes: { valor: T; label: string }[]; valor: T; onChange: (v: T) => void }) {
   return (
-    <div className="inline-grid rounded-md bg-stone-200/70 p-0.5" style={{ gridTemplateColumns: `repeat(${opcoes.length}, minmax(0, 1fr))` }} role="radiogroup">
+    <div className="inline-grid rounded-md bg-stone-200/70 p-0.5" style={{ gridTemplateColumns: `repeat(${opcoes.length}, minmax(max-content, 1fr))` }} role="radiogroup">
       {opcoes.map((o) => (
         <button
           key={o.valor}
@@ -280,7 +280,7 @@ export function Segmentado<T extends string>({ opcoes, valor, onChange }: { opco
           aria-checked={valor === o.valor}
           onClick={() => onChange(o.valor)}
           className={clsx(
-            'h-9 rounded-[5px] px-3 text-[13px] font-medium transition-colors sm:h-8',
+            'h-9 whitespace-nowrap rounded-[5px] px-3 text-[13px] font-medium transition-colors sm:h-8',
             valor === o.valor ? 'bg-white text-stone-900 shadow-card' : 'text-stone-600 hover:text-stone-900',
           )}
         >

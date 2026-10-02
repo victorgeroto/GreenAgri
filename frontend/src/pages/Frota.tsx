@@ -1,17 +1,21 @@
 import { clsx } from 'clsx'
-import { Gauge, Pencil, Plus, Tractor, Wrench } from 'lucide-react'
+import { CloudOff, Gauge, Pencil, Plus, Tractor, UserPlus, Wrench } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Badge, Button, Card, Carregando, Erro, Field, Input, PageHeader, Select, Sheet, Textarea, Vazio } from '@/components/ui'
 import { useToast } from '@/components/Toast'
 import { ApiError } from '@/lib/api'
 import { diasAte, fmtData, fmtNumero, STATUS_VEICULO, TIPOS_VEICULO } from '@/lib/format'
-import type { StatusVeiculo, TipoVeiculo, Veiculo, VeiculoInput } from '@/lib/types'
+import type { Alocacao, StatusVeiculo, Talhao, TipoVeiculo, Veiculo, VeiculoInput } from '@/lib/types'
 import { useDados, useEscrita } from '@/offline/hooks'
+import { AlocarSheet } from './equipe/AlocarSheet'
+import { iniciais, resumoAtividade } from './equipe/componentes'
+import { useEquipe } from './equipe/hooks'
 
 const tomStatus = { DISPONIVEL: 'verde', EM_OPERACAO: 'azul', MANUTENCAO: 'amarelo', INATIVO: 'neutro' } as const
 const RODOVIARIOS: TipoVeiculo[] = ['CAMINHAO', 'UTILITARIO']
 
-function VeiculoCard({ v, onEditar }: { v: Veiculo; onEditar: () => void }) {
+function VeiculoCard({ v, alocacao, onEditar, onAlocar }: { v: Veiculo; alocacao?: Alocacao; onEditar: () => void; onAlocar: () => void }) {
+  const podeAlocar = !alocacao && v.status !== 'INATIVO'
   const dias = v.proximaManutencao ? diasAte(v.proximaManutencao) : undefined
   return (
     <Card className="flex flex-col gap-3">
@@ -44,9 +48,34 @@ function VeiculoCard({ v, onEditar }: { v: Veiculo; onEditar: () => void }) {
         </div>
       </div>
       {v.observacoes && <p className="text-sm text-stone-600">{v.observacoes}</p>}
-      <Button variant="secondary" size="sm" icon={Pencil} onClick={onEditar} className="self-start">
-        Atualizar
-      </Button>
+      <div className="flex items-center gap-2.5 rounded-md border border-stone-200 px-2.5 py-2">
+        {alocacao ? (
+          <>
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-[11px] font-semibold text-stone-700">{iniciais(alocacao.operadorNome)}</span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[13px] font-medium text-stone-800">{alocacao.operadorNome}</p>
+              <p className="truncate text-xs text-stone-500">{resumoAtividade(alocacao)}</p>
+            </div>
+            {alocacao.pendente && (
+              <Badge tom="amarelo">
+                <CloudOff className="h-3 w-3" /> Na fila
+              </Badge>
+            )}
+          </>
+        ) : (
+          <p className="flex-1 text-xs text-stone-500">Sem operador alocado</p>
+        )}
+      </div>
+      <div className="mt-auto flex gap-2">
+        <Button variant="secondary" size="sm" icon={Pencil} onClick={onEditar}>
+          Atualizar
+        </Button>
+        {podeAlocar && (
+          <Button variant="secondary" size="sm" icon={UserPlus} onClick={onAlocar}>
+            {v.status === 'MANUTENCAO' ? 'Alocar mecânico' : 'Alocar operador'}
+          </Button>
+        )}
+      </div>
     </Card>
   )
 }
@@ -125,6 +154,9 @@ function VeiculoSheet({ aberto, onFechar, veiculo }: { aberto: boolean; onFechar
 export default function Frota() {
   const { data, isLoading, error, refetch } = useDados<Veiculo[]>('/veiculos')
   const [editando, setEditando] = useState<{ veiculo?: Veiculo } | null>(null)
+  const [alocando, setAlocando] = useState<Veiculo>()
+  const { data: talhoes = [] } = useDados<Talhao[]>('/talhoes')
+  const { operadores, alocacaoPorVeiculo } = useEquipe({ veiculos: data ?? [], talhoes })
   const pendentes = (data ?? []).filter((v) => v.manutencaoPendente).length
   const emManutencao = (data ?? []).filter((v) => v.status === 'MANUTENCAO').length
 
@@ -144,11 +176,20 @@ export default function Frota() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {data.map((v) => (
-            <VeiculoCard key={v.id} v={v} onEditar={() => setEditando({ veiculo: v })} />
+            <VeiculoCard key={v.id} v={v} alocacao={alocacaoPorVeiculo.get(v.id)} onEditar={() => setEditando({ veiculo: v })} onAlocar={() => setAlocando(v)} />
           ))}
         </div>
       )}
       <VeiculoSheet aberto={!!editando} onFechar={() => setEditando(null)} veiculo={editando?.veiculo} />
+      <AlocarSheet
+        aberto={!!alocando}
+        onFechar={() => setAlocando(undefined)}
+        operadores={operadores}
+        veiculos={data ?? []}
+        talhoes={talhoes}
+        ocupacao={alocacaoPorVeiculo}
+        veiculoInicial={alocando}
+      />
     </>
   )
 }

@@ -11,6 +11,7 @@ const Estoque = lazy(() => import('./pages/estoque/Estoque'))
 const ProdutoDetalhe = lazy(() => import('./pages/estoque/ProdutoDetalhe'))
 const Colheitas = lazy(() => import('./pages/colheitas/Colheitas'))
 const Frota = lazy(() => import('./pages/Frota'))
+const Equipe = lazy(() => import('./pages/equipe/Equipe'))
 const Campo = lazy(() => import('./pages/campo/Campo'))
 const DispositivoDetalhe = lazy(() => import('./pages/campo/DispositivoDetalhe'))
 const Sincronizacao = lazy(() => import('./pages/Sincronizacao'))
@@ -21,6 +22,7 @@ const ROTAS: [string, ReactNode][] = [
   ['/estoque/:id', <ProdutoDetalhe />],
   ['/colheitas', <Colheitas />],
   ['/frota', <Frota />],
+  ['/equipe', <Equipe />],
   ['/campo', <Campo />],
   ['/campo/:id', <DispositivoDetalhe />],
   ['/sincronizacao', <Sincronizacao />],
