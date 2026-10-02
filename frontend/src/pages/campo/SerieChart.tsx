@@ -23,7 +23,7 @@ export function SerieChart({ titulo, unidade, dados, campo, limite, dominio = ['
   const atual = pontos.at(-1)?.v
 
   return (
-    <figure className="rounded-2xl border border-stone-200 bg-white p-4">
+    <figure className="rounded-lg border border-stone-200 bg-white p-4">
       <figcaption className="mb-2 flex items-baseline justify-between">
         <span className="text-sm font-medium text-stone-700">{titulo}</span>
         <span className="text-lg font-semibold tabular-nums text-stone-900">
