@@ -241,6 +241,22 @@ class ApiIntegrationTest {
 		throw new AssertionError("Sem colheita ativa em " + talhao);
 	}
 
+	@Test
+	void produtoAceitaFotoValidaERecusaConteudoQueNaoEImagem() throws Exception {
+		String base = """
+				{"sku":"%s","nome":"Com foto","categoria":"GRAOS","unidade":"SACA","estoqueMinimo":1,"imagem":"%s"}
+				""";
+		mvc.perform(post("/api/produtos").with(operador()).contentType(MediaType.APPLICATION_JSON)
+			.content(base.formatted("IMG-01", "data:image/jpeg;base64,/9j/4AAQSkZJRg==")))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.imagem").value("data:image/jpeg;base64,/9j/4AAQSkZJRg=="));
+
+		mvc.perform(post("/api/produtos").with(operador()).contentType(MediaType.APPLICATION_JSON)
+			.content(base.formatted("IMG-02", "javascript:alert(1)")))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.campos.imagem").value("Imagem inválida"));
+	}
+
 	private long criarProduto(String sku, int saldoInicial) throws Exception {
 		String body = """
 				{"sku":"%s","nome":"Produto %s","categoria":"GRAOS","unidade":"SACA",

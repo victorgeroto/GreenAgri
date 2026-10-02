@@ -8,6 +8,7 @@ import { AuthProvider } from './auth/AuthContext'
 import { ToastProvider } from './components/Toast'
 import { ApiError } from './lib/api'
 import { SyncProvider } from './offline/SyncContext'
+import '@fontsource-variable/inter'
 import 'leaflet/dist/leaflet.css'
 import './index.css'
 

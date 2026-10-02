@@ -92,7 +92,7 @@ public class DataSeeder implements ApplicationRunner {
 	}
 
 	record ProdutoSeed(String sku, String nome, Categoria categoria, Unidade unidade, BigDecimal estoqueMinimo,
-			BigDecimal saldoInicial, String localizacao, String descricao) {
+			BigDecimal saldoInicial, String localizacao, String descricao, String imagem) {
 	}
 
 	record MovimentacaoSeed(String sku, TipoMovimentacao tipo, BigDecimal quantidade, String motivo, int diasAtras) {
@@ -149,6 +149,7 @@ public class DataSeeder implements ApplicationRunner {
 			p.setEstoqueMinimo(s.estoqueMinimo());
 			p.setLocalizacao(s.localizacao());
 			p.setDescricao(s.descricao());
+			p.setImagem(s.imagem());
 			produtos.save(p);
 			estoqueService.registrar(p.getId(), TipoMovimentacao.ENTRADA, s.saldoInicial(), "Saldo inicial",
 					RESPONSAVEL, null, inicio);

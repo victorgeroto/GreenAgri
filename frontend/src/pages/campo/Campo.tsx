@@ -21,13 +21,14 @@ function Arquitetura() {
     { icon: BellRing, titulo: 'Alertas e estoque', texto: 'Geada, solo seco, grão aquecendo e divergência silo × estoque.' },
   ]
   return (
-    <Card className="mb-5">
-      <h2 className="mb-3 text-sm font-semibold text-stone-700">Como funciona</h2>
+    <Card className="mt-6">
+      <h2 className="text-sm font-semibold text-stone-900">Como os dados chegam aqui</h2>
+      <p className="mb-3 text-xs text-stone-500">Do sensor no campo ao alerta no painel</p>
       <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {etapas.map(({ icon: Icon, titulo, texto }, i) => (
-          <li key={titulo} className="relative flex gap-3 rounded-xl bg-stone-50 p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-800">
-              <Icon className="h-5 w-5" aria-hidden />
+          <li key={titulo} className="relative flex gap-3 rounded-md border border-stone-200 p-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-stone-100 text-stone-600">
+              <Icon className="h-4 w-4" aria-hidden />
             </span>
             <div>
               <p className="text-sm font-medium">
@@ -90,7 +91,7 @@ function DispositivoCard({ d }: { d: Dispositivo }) {
       <Card className="flex h-full flex-col gap-3 transition-shadow group-hover:shadow-md">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
-            <span className="rounded-xl bg-sky-50 p-2.5 text-sky-700">
+            <span className="rounded-md border border-stone-200 bg-white p-2 text-stone-600">
               <Icone className="h-5 w-5" aria-hidden />
             </span>
             <div className="min-w-0">
@@ -126,12 +127,11 @@ export default function Campo() {
         titulo="Campo conectado"
         subtitulo="Telemetria dos dispositivos embarcados (ESP32) espalhados pela fazenda"
         acoes={
-          <Badge tom={online === lista.length ? 'verde' : 'amarelo'} className="h-8 px-3 text-sm">
+          <Badge tom={online === lista.length ? 'verde' : 'amarelo'} className="h-8 px-2.5 text-[13px]">
             <Wifi className="h-4 w-4" /> {online}/{lista.length} online
           </Badge>
         }
       />
-      <Arquitetura />
       <Alertas alertas={alertas.data ?? []} />
       {dispositivos.isLoading ? (
         <Carregando />
@@ -146,6 +146,7 @@ export default function Campo() {
           ))}
         </div>
       )}
+      <Arquitetura />
     </>
   )
 }

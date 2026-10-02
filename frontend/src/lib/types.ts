@@ -36,6 +36,8 @@ export interface Produto {
   abaixoDoMinimo: boolean
   localizacao?: string
   descricao?: string
+  /** Caminho público (/img/...) ou data URL JPEG. */
+  imagem?: string
   atualizadoEm: string
 }
 
@@ -48,6 +50,7 @@ export interface ProdutoInput {
   quantidadeInicial?: number
   localizacao?: string
   descricao?: string
+  imagem?: string
 }
 
 export type TipoMovimentacao = 'ENTRADA' | 'SAIDA' | 'AJUSTE'

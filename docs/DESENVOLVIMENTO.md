@@ -136,6 +136,11 @@ src/
 5. **Consistência visual** (`offline/pendentes.ts`): o saldo exibido é a foto do servidor com os lançamentos pendentes aplicados por cima, e o histórico mostra os pendentes com o selo "na fila".
 6. **Sessão expirada** não apaga a fila: o app pede login novamente e continua de onde parou.
 
+### Imagens
+
+- **Fotos do campo** (`public/img/campo/`): usadas no carrossel da visão geral e da tela de entrada (`components/Carrossel.tsx`). Foram redimensionadas para até 1600 px e são pré-carregadas pelo service worker, então o carrossel funciona offline.
+- **Fotos de produto**: a coluna `produtos.imagem` (migração V3) guarda um caminho público (`/img/produtos/...`, usado nos dados de demonstração) ou uma *data URL* JPEG enviada pelo app. O app reduz a foto para até 800 px antes de enviar (`prepararFoto` em `components/ImagemProduto.tsx`), e a API recusa imagens acima de ~300 KB. Sem foto, aparece o ícone da categoria.
+
 ### Design responsivo
 
-Mobile-first com Tailwind: barra de navegação inferior e formulários em *bottom sheet* no celular, menu lateral e diálogos centralizados a partir de `lg`. Os campos numéricos usam `inputMode="decimal"` para abrir o teclado numérico, e os alvos de toque têm pelo menos 44 px.
+Mobile-first com Tailwind, tipografia Inter (empacotada localmente, funciona offline), paleta neutra com verde só nas ações principais: barra de navegação inferior e formulários em *bottom sheet* no celular, menu lateral e diálogos centralizados a partir de `lg`. Os campos numéricos usam `inputMode="decimal"` para abrir o teclado numérico, e os botões têm 40 px de altura no celular.

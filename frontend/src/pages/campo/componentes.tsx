@@ -64,7 +64,7 @@ export function Reconciliacao({ r }: { r: ReconciliacaoSilo }) {
     { label: 'Registrado no estoque', valor: r.registradoKg, cor: 'bg-stone-400' },
   ]
   return (
-    <div className={clsx('rounded-xl p-3', r.divergente ? 'bg-amber-50' : 'bg-stone-50')}>
+    <div className={clsx('rounded-md p-3', r.divergente ? 'bg-amber-50' : 'bg-stone-50')}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-xs font-medium text-stone-600">Silo × estoque · {r.produtoNome}</span>
         {r.divergenciaPercentual != null && (
@@ -112,7 +112,7 @@ export function ResumoLeitura({ d }: { d: Dispositivo }) {
   return (
     <dl className="grid grid-cols-2 gap-2">
       {itens.map(([label, valor, un]) => (
-        <div key={label as string} className="rounded-xl bg-stone-50 p-2">
+        <div key={label as string} className="rounded-md bg-stone-50 p-2">
           <dt className="text-xs text-stone-500">{label}</dt>
           <dd className="text-lg font-semibold tabular-nums">
             {valor == null ? '—' : typeof valor === 'string' ? valor : `${fmtNumero(valor)} ${un}`}

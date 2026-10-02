@@ -1,4 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { Camera, Trash2 } from 'lucide-react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { ImagemProduto, prepararFoto } from '@/components/ImagemProduto'
 import { Button, Field, Input, Select, Sheet, Textarea } from '@/components/ui'
 import { useToast } from '@/components/Toast'
 import { ApiError } from '@/lib/api'
@@ -14,6 +16,8 @@ export function ProdutoSheet({ aberto, onFechar, produto }: { aberto: boolean; o
   const [form, setForm] = useState<ProdutoInput>(vazio)
   const [erros, setErros] = useState<Record<string, string>>({})
   const [erro, setErro] = useState<string>()
+  const [processandoFoto, setProcessandoFoto] = useState(false)
+  const arquivo = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!aberto) return
@@ -23,6 +27,20 @@ export function ProdutoSheet({ aberto, onFechar, produto }: { aberto: boolean; o
   }, [aberto, produto])
 
   const set = <K extends keyof ProdutoInput>(k: K, v: ProdutoInput[K]) => setForm((f) => ({ ...f, [k]: v }))
+
+  async function escolherFoto(lista: FileList | null) {
+    const f = lista?.[0]
+    if (!f) return
+    setProcessandoFoto(true)
+    try {
+      set('imagem', await prepararFoto(f))
+    } catch (err) {
+      setErros((x) => ({ ...x, imagem: err instanceof Error ? err.message : 'Não foi possível ler a foto' }))
+    } finally {
+      setProcessandoFoto(false)
+      if (arquivo.current) arquivo.current.value = ''
+    }
+  }
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
@@ -41,6 +59,21 @@ export function ProdutoSheet({ aberto, onFechar, produto }: { aberto: boolean; o
   return (
     <Sheet aberto={aberto} onFechar={onFechar} titulo={produto ? 'Editar produto' : 'Novo produto'}>
       <form onSubmit={enviar} className="space-y-4">
+        <div className="flex items-center gap-4">
+          <ImagemProduto key={form.imagem ?? "sem"} produto={form} tamanho="md" className="!h-20 !w-20" />
+          <div className="min-w-0">
+            <p className="text-[13px] font-medium text-stone-700">Foto do produto</p>
+            <p className="mb-2 text-xs text-stone-500">Tire uma foto ou escolha da galeria. Ela é reduzida automaticamente.</p>
+            <div className="flex gap-2">
+              <Button type="button" variant="secondary" size="sm" icon={Camera} carregando={processandoFoto} onClick={() => arquivo.current?.click()}>
+                {form.imagem ? 'Trocar foto' : 'Adicionar foto'}
+              </Button>
+              {form.imagem && <Button type="button" variant="ghost" size="sm" icon={Trash2} onClick={() => set('imagem', undefined)} aria-label="Remover foto" />}
+            </div>
+            {erros.imagem && <p className="mt-1 text-xs text-red-600">{erros.imagem}</p>}
+          </div>
+          <input ref={arquivo} type="file" accept="image/*" className="hidden" onChange={(e) => escolherFoto(e.target.files)} />
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="SKU" erro={erros.sku}>
             {(id) => <Input id={id} value={form.sku} onChange={(e) => set('sku', e.target.value.toUpperCase())} required maxLength={40} placeholder="GR-SOJA-01" />}
@@ -85,7 +118,7 @@ export function ProdutoSheet({ aberto, onFechar, produto }: { aberto: boolean; o
         <Field label="Descrição">
           {(id) => <Textarea id={id} value={form.descricao ?? ''} maxLength={500} onChange={(e) => set('descricao', e.target.value)} />}
         </Field>
-        {erro && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+        {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
         <Button type="submit" className="w-full" carregando={salvar.isPending}>
           Salvar
         </Button>

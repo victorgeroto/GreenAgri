@@ -17,7 +17,7 @@ function VeiculoCard({ v, onEditar }: { v: Veiculo; onEditar: () => void }) {
     <Card className="flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3">
-          <span className="rounded-xl bg-solo-100 p-2.5 text-solo-500">
+          <span className="rounded-md border border-stone-200 bg-white p-2 text-stone-600">
             <Tractor className="h-5 w-5" />
           </span>
           <div>
@@ -30,13 +30,13 @@ function VeiculoCard({ v, onEditar }: { v: Veiculo; onEditar: () => void }) {
         <Badge tom={tomStatus[v.status]}>{STATUS_VEICULO[v.status]}</Badge>
       </div>
       <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="flex items-center gap-2 rounded-xl bg-stone-50 p-2">
+        <div className="flex items-center gap-2 rounded-md bg-stone-50 p-2">
           <Gauge className="h-4 w-4 text-stone-400" />
           <span className="tabular-nums">
             {fmtNumero(v.horimetro)} {RODOVIARIOS.includes(v.tipo) ? 'km' : 'h'}
           </span>
         </div>
-        <div className={clsx('flex items-center gap-2 rounded-xl p-2', v.manutencaoPendente ? 'bg-amber-50 text-amber-800' : 'bg-stone-50')}>
+        <div className={clsx('flex items-center gap-2 rounded-md p-2', v.manutencaoPendente ? 'bg-amber-50 text-amber-800' : 'bg-stone-50')}>
           <Wrench className="h-4 w-4 shrink-0 opacity-60" />
           <span className="truncate">
             {dias === undefined ? 'Sem revisão' : dias < 0 ? `Revisão vencida (${fmtData(v.proximaManutencao)})` : `Revisão ${fmtData(v.proximaManutencao)}`}
@@ -115,7 +115,7 @@ function VeiculoSheet({ aberto, onFechar, veiculo }: { aberto: boolean; onFechar
           <Field label="Próxima revisão">{(id) => <Input id={id} type="date" value={f.proximaManutencao ?? ''} onChange={(e) => set('proximaManutencao', e.target.value)} />}</Field>
         </div>
         <Field label="Observações">{(id) => <Textarea id={id} value={f.observacoes ?? ''} onChange={(e) => set('observacoes', e.target.value)} maxLength={500} />}</Field>
-        {erro && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+        {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
         <Button type="submit" className="w-full" carregando={salvar.isPending}>Salvar</Button>
       </form>
     </Sheet>

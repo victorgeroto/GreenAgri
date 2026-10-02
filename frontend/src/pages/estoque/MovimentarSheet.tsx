@@ -113,7 +113,7 @@ export function MovimentarSheet({ aberto, onFechar, produtos, produtoInicial }: 
         <Field label="Motivo (opcional)">
           {(id) => <Textarea id={id} value={motivo} maxLength={200} onChange={(e) => setMotivo(e.target.value)} placeholder="Ex.: venda, plantio do talhão T-03, compra NF 123" />}
         </Field>
-        {erro && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+        {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
         <Button type="submit" className="w-full" carregando={movimentar.isPending} disabled={!produto || !quantidade || saldoInsuficiente}>
           Registrar
         </Button>

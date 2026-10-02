@@ -73,5 +73,6 @@ public class ProdutoService {
 		p.setEstoqueMinimo(req.estoqueMinimo());
 		p.setLocalizacao(req.localizacao());
 		p.setDescricao(req.descricao());
+		p.setImagem(req.imagem() == null || req.imagem().isBlank() ? null : req.imagem());
 	}
 }
