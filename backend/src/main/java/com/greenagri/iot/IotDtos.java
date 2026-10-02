@@ -36,18 +36,25 @@ public final class IotDtos {
 			@JsonProperty("us") Double umidadeSolo,
 			@JsonProperty("nivel") Double nivelPercentual,
 			@JsonProperty("bat") Double bateria,
-			Integer rssi) {
+			Integer rssi,
+			/** Rastreador de máquina: posição GNSS, velocidade (km/h) e implemento em operação. */
+			Double lat,
+			Double lon,
+			@JsonProperty("vel") Double velocidade,
+			@JsonProperty("op") Boolean operando) {
 	}
 
-	public record TelemetriaResponse(int aceitas, int duplicadas, int alertasGerados) {
+	public record TelemetriaResponse(int aceitas, int duplicadas, int alertasGerados, int mudancasStatus) {
 	}
 
 	public record LeituraResponse(Instant medidoEm, Double temperatura, Double umidadeAr, Double umidadeSolo,
-			Double nivelPercentual, Double bateria, Integer rssi) {
+			Double nivelPercentual, Double bateria, Integer rssi, Double latitude, Double longitude,
+			Double velocidade, Boolean operando) {
 
 		public static LeituraResponse de(Leitura l) {
 			return new LeituraResponse(l.getMedidoEm(), l.getTemperatura(), l.getUmidadeAr(), l.getUmidadeSolo(),
-					l.getNivelPercentual(), l.getBateria(), l.getRssi());
+					l.getNivelPercentual(), l.getBateria(), l.getRssi(), l.getLatitude(), l.getLongitude(),
+					l.getVelocidade(), l.getOperando());
 		}
 	}
 
@@ -58,7 +65,8 @@ public final class IotDtos {
 
 	public record DispositivoResponse(Long id, String codigo, String nome, TipoDispositivo tipo, String localizacao,
 			Double latitude, Double longitude, String firmwareVersao, Instant ultimoContato, boolean online,
-			Double bateria, LeituraResponse ultimaLeitura, ReconciliacaoSilo silo) {
+			Double bateria, LeituraResponse ultimaLeitura, ReconciliacaoSilo silo, Long veiculoId,
+			String veiculoIdentificacao) {
 	}
 
 	public record DispositivoRequest(
@@ -69,7 +77,8 @@ public final class IotDtos {
 			Double latitude,
 			Double longitude,
 			Long produtoId,
-			BigDecimal capacidadeKg) {
+			BigDecimal capacidadeKg,
+			Long veiculoId) {
 	}
 
 	/** Devolvido uma única vez no provisionamento: a chave não é armazenada em texto. */

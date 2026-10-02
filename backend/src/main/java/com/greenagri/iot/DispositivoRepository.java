@@ -8,11 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DispositivoRepository extends JpaRepository<Dispositivo, Long> {
 
-	@EntityGraph(attributePaths = "produto")
+	@EntityGraph(attributePaths = { "produto", "veiculo" })
 	Optional<Dispositivo> findByCodigo(String codigo);
 
 	boolean existsByCodigoIgnoreCase(String codigo);
 
-	@EntityGraph(attributePaths = "produto")
+	@EntityGraph(attributePaths = { "produto", "veiculo" })
 	List<Dispositivo> findAllByOrderByCodigoAsc();
 }

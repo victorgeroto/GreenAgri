@@ -3,6 +3,7 @@ package com.greenagri.iot;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import com.greenagri.frota.Veiculo;
 import com.greenagri.produto.Produto;
 
 import jakarta.persistence.Entity;
@@ -59,4 +60,9 @@ public class Dispositivo {
 	private Produto produto;
 
 	private BigDecimal capacidadeKg;
+
+	/** Para rastreadores: máquina onde o dispositivo está instalado. */
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "veiculo_id")
+	private Veiculo veiculo;
 }
