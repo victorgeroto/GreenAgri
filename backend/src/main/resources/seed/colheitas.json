@@ -1,0 +1,7 @@
+[
+  { "talhao": "T-01", "cultura": "Soja", "areaHa": 120, "diasPlantio": -380, "diasPrevisao": -250, "producaoEstimadaKg": 420000, "status": "CONCLUIDA", "diasColheita": -248, "producaoRealKg": 432000, "produtoSku": "GR-SOJA-01", "observacoes": "Safra 24/25 - 60 sc/ha" },
+  { "talhao": "T-02", "cultura": "Milho safrinha", "areaHa": 85, "diasPlantio": -100, "diasPrevisao": 20, "producaoEstimadaKg": 510000, "status": "EM_ANDAMENTO", "produtoSku": "GR-MILHO-01", "observacoes": "Sensor de solo SOLO-T02 instalado" },
+  { "talhao": "T-03", "cultura": "Soja", "areaHa": 150, "diasPlantio": -40, "diasPrevisao": 80, "producaoEstimadaKg": 540000, "status": "EM_ANDAMENTO", "produtoSku": "GR-SOJA-01", "observacoes": "Cultivar RR2 PRO, espaçamento 45 cm" },
+  { "talhao": "T-04", "cultura": "Trigo", "areaHa": 60, "diasPlantio": -110, "diasPrevisao": 5, "producaoEstimadaKg": 180000, "status": "EM_ANDAMENTO", "produtoSku": "GR-TRIGO-01", "observacoes": "Pronto para colher: use 'Concluir' para lançar no estoque" },
+  { "talhao": "T-05", "cultura": "Feijão", "areaHa": 40, "diasPlantio": 10, "diasPrevisao": 100, "producaoEstimadaKg": 72000, "status": "PLANEJADA", "observacoes": "Aguardando janela de plantio" }
+]

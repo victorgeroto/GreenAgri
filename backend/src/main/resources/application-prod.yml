@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/greenagri}
+    username: ${DB_USER:greenagri}
+    password: ${DB_PASSWORD:greenagri}
+
+greenagri:
+  seed:
+    enabled: ${GREENAGRI_SEED:false}
