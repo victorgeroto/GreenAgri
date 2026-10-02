@@ -9,7 +9,7 @@ import { Login } from './pages/Login'
 const Painel = lazy(() => import('./pages/Painel'))
 const Estoque = lazy(() => import('./pages/estoque/Estoque'))
 const ProdutoDetalhe = lazy(() => import('./pages/estoque/ProdutoDetalhe'))
-const Colheitas = lazy(() => import('./pages/Colheitas'))
+const Colheitas = lazy(() => import('./pages/colheitas/Colheitas'))
 const Frota = lazy(() => import('./pages/Frota'))
 const Campo = lazy(() => import('./pages/campo/Campo'))
 const DispositivoDetalhe = lazy(() => import('./pages/campo/DispositivoDetalhe'))
