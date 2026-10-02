@@ -39,25 +39,25 @@ public class EquipeController {
 	@GetMapping("/operadores/{id}/alocacoes")
 	@Operation(summary = "Últimas 30 atividades do operador")
 	public List<AlocacaoResponse> historico(@PathVariable Long id) {
-		return service.historico(id).stream().map(AlocacaoResponse::de).toList();
+		return service.historico(id);
 	}
 
 	@GetMapping("/alocacoes")
 	@Operation(summary = "Atividades em andamento")
 	public List<AlocacaoResponse> emAndamento() {
-		return service.emAndamento().stream().map(AlocacaoResponse::de).toList();
+		return service.emAndamento();
 	}
 
 	@PostMapping("/alocacoes")
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "Aloca um operador numa atividade, máquina e/ou talhão")
 	public AlocacaoResponse alocar(@Valid @RequestBody AlocacaoRequest req, @AuthenticationPrincipal Jwt jwt) {
-		return AlocacaoResponse.de(service.alocar(req, jwt.getClaimAsString("nome")));
+		return service.alocar(req, jwt.getClaimAsString("nome"));
 	}
 
 	@PostMapping("/alocacoes/{id}/encerrar")
 	@Operation(summary = "Encerra a atividade e libera a máquina")
 	public AlocacaoResponse encerrar(@PathVariable Long id) {
-		return AlocacaoResponse.de(service.encerrar(id));
+		return service.encerrar(id);
 	}
 }
