@@ -1,0 +1,4 @@
+[
+  { "nome": "Administrador GreenAgri", "email": "admin@greenagri.dev", "senha": "greenagri123", "perfil": "ADMIN" },
+  { "nome": "Operador de Campo", "email": "operador@greenagri.dev", "senha": "greenagri123", "perfil": "OPERADOR" }
+]

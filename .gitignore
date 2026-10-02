@@ -1,33 +1,28 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Backend (Maven)
+backend/target/
+!backend/.mvn/wrapper/maven-wrapper.jar
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Frontend (Node)
+node_modules/
+frontend/dist/
+frontend/dev-dist/
+*.tsbuildinfo
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# Ambiente
+.env
+.env.local
+*.log
+
+# IDEs
+.idea/
 *.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
 .vscode/
+.classpath
+.project
+.settings/
+.factorypath
+.DS_Store
+
+# Firmware
+firmware/esp32-sensor/include/config.h
+firmware/esp32-sensor/.pio/
