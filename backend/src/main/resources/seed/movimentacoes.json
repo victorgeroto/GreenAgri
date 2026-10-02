@@ -1,0 +1,15 @@
+[
+  { "sku": "DF-GLIFO-01", "tipo": "SAIDA", "quantidade": 160, "motivo": "Dessecação pré-plantio talhão T-03", "diasAtras": 42 },
+  { "sku": "SE-SOJA-01", "tipo": "SAIDA", "quantidade": 120, "motivo": "Plantio talhão T-03", "diasAtras": 40 },
+  { "sku": "FE-NPK-01", "tipo": "SAIDA", "quantidade": 12, "motivo": "Adubação de base talhão T-03", "diasAtras": 38 },
+  { "sku": "CB-DIESEL-01", "tipo": "ENTRADA", "quantidade": 5000, "motivo": "Compra - NF 18.442 Posto Agro Sul", "diasAtras": 25 },
+  { "sku": "GR-SOJA-01", "tipo": "SAIDA", "quantidade": 600, "motivo": "Venda - Cooperativa Coopavel", "diasAtras": 20 },
+  { "sku": "FE-UREIA-01", "tipo": "SAIDA", "quantidade": 9, "motivo": "Cobertura milho talhão T-02", "diasAtras": 15 },
+  { "sku": "GR-MILHO-01", "tipo": "SAIDA", "quantidade": 400, "motivo": "Trato - confinamento", "diasAtras": 12 },
+  { "sku": "CB-DIESEL-01", "tipo": "SAIDA", "quantidade": 3800, "motivo": "Abastecimento da frota", "diasAtras": 10 },
+  { "sku": "PC-FILTRO-01", "tipo": "SAIDA", "quantidade": 2, "motivo": "Revisão 500 h trator TR-02", "diasAtras": 8 },
+  { "sku": "GR-SOJA-01", "tipo": "SAIDA", "quantidade": 350, "motivo": "Venda - trading (contrato 2291)", "diasAtras": 6 },
+  { "sku": "CB-DIESEL-01", "tipo": "SAIDA", "quantidade": 1800, "motivo": "Abastecimento colheitadeira CH-01", "diasAtras": 3 },
+  { "sku": "RA-BOV-01", "tipo": "SAIDA", "quantidade": 1600, "motivo": "Trato diário - lote 4", "diasAtras": 2 },
+  { "sku": "GR-TRIGO-01", "tipo": "AJUSTE", "quantidade": 350, "motivo": "Inventário mensal (quebra técnica)", "diasAtras": 1 }
+]
