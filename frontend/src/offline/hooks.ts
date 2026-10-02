@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
+import { useFazenda } from '@/fazenda/FazendaContext'
 import { api } from '@/lib/api'
 import { comCache } from './cache'
 import { enviar, type RequisicaoEscrita, type ResultadoEnvio } from './sync'
@@ -8,10 +9,14 @@ export function useDados<T>(
   caminho: string,
   opcoes: Omit<UseQueryOptions<T>, 'queryKey' | 'queryFn'> = {},
 ) {
+  const { atual } = useFazenda()
+  const fazendaId = atual?.id
   return useQuery<T>({
-    queryKey: [caminho],
-    queryFn: () => comCache(caminho, () => api<T>(caminho)),
+    // A fazenda faz parte da chave: trocar de fazenda busca (e guarda offline) os dados dela.
+    queryKey: [fazendaId, caminho],
+    queryFn: () => comCache(`${fazendaId}:${caminho}`, () => api<T>(caminho, { fazendaId })),
     ...opcoes,
+    enabled: !!fazendaId && (opcoes.enabled ?? true),
   })
 }
 

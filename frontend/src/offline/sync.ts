@@ -1,4 +1,4 @@
-import { api, ApiError, NetworkError } from '@/lib/api'
+import { api, ApiError, fazendaStore, NetworkError } from '@/lib/api'
 import { db, type ItemFila } from './db'
 
 export type ResultadoEnvio<T> = { status: 'enviado'; dados: T } | { status: 'na-fila' }
@@ -26,7 +26,7 @@ export async function enviar<T>(req: RequisicaoEscrita): Promise<ResultadoEnvio<
       if (!(e instanceof NetworkError)) throw e
     }
   }
-  await db.fila.add({ ...req, criadoEm: Date.now(), status: 'pendente', tentativas: 0 })
+  await db.fila.add({ ...req, fazendaId: fazendaStore.get(), criadoEm: Date.now(), status: 'pendente', tentativas: 0 })
   if (navigator.onLine) void processarFila()
   return { status: 'na-fila' }
 }
@@ -54,7 +54,8 @@ async function executar(): Promise<ResultadoSincronizacao> {
 
   for (const item of itens) {
     try {
-      await api(item.caminho, { method: item.metodo, body: item.corpo })
+      // Itens gravados antes do suporte a várias fazendas não têm fazendaId: vão para a selecionada.
+      await api(item.caminho, { method: item.metodo, body: item.corpo, fazendaId: item.fazendaId ?? fazendaStore.get() })
       await db.fila.delete(item.id!)
       resultado.enviados++
     } catch (e) {
