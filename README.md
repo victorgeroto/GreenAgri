@@ -1,9 +1,9 @@
-# 🌱 GreenAgri
+# GreenAgri
 
 **Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e receba alertas dos sensores instalados no campo, tudo num só app.
 
 <p align="center">
-  <img src="docs/img/mobile-painel.png" width="230" alt="Painel no celular">
+  <img src="docs/img/mobile-painel.png" width="230" alt="Visão geral no celular, com fotos do campo">
   <img src="docs/img/mobile-estoque-offline.png" width="230" alt="Lançamento de estoque feito offline">
   <img src="docs/img/mobile-campo.png" width="230" alt="Sensores de campo">
 </p>
@@ -12,13 +12,27 @@
 
 ## O que dá para fazer
 
-### 📦 Estoque
+### Visão geral
+- A tela inicial abre com um **carrossel de fotos do campo** (plantio, lavoura, adubação), com a safra atual, a área em campo e o clima medido pela estação da fazenda por cima das fotos.
+- Logo abaixo ficam os indicadores do dia: produtos abaixo do mínimo, lavouras em aberto, máquinas na oficina e sensores online.
+
+<p align="center">
+  <img src="docs/img/desktop-painel.png" width="760" alt="Visão geral no computador, com carrossel de fotos do campo">
+</p>
+
+### Estoque
+- Veja todos os produtos numa tabela com **foto**, saldo, estoque mínimo e situação (*normal*, *atenção* ou *repor*).
+- **Adicione a foto do produto** pela câmera do celular ou pela galeria. O app reduz a imagem automaticamente, e isso funciona até offline.
 - Veja o saldo de cada produto (sacas, toneladas, litros, kg ou unidades) e quanto falta para o **estoque mínimo**.
 - Registre **entradas** (compras, colheita), **saídas** (vendas, plantio, abastecimento) e **inventários** (contagem física).
 - O app **não deixa a saída passar do que existe**: se faltar produto, ele avisa antes de salvar.
 - Cada produto tem um **histórico completo**: quem lançou, quando e por quê.
 
-### 🗺️ Lavouras no mapa
+<p align="center">
+  <img src="docs/img/desktop-estoque.png" width="760" alt="Tabela de estoque com fotos dos produtos">
+</p>
+
+### Lavouras no mapa
 - Veja **todos os talhões da fazenda no mapa**, cada um colorido pela situação da lavoura: *planejada*, *em desenvolvimento*, *em colheita* ou *concluída*.
 - Use **Em campo agora** para ver o que ocupa cada talhão hoje, ou escolha uma **safra** (2024/25, 2025/26…) para ver as áreas e a rotação de culturas daquele ano.
 - Toque em um talhão para ver a lavoura, o histórico de mudanças de status e as safras anteriores.
@@ -30,7 +44,7 @@
   <img src="docs/img/desktop-mapa-safra.png" width="760" alt="Talhões no mapa filtrados pela safra 2025/26">
 </p>
 
-### 🌾 Colheitas
+### Colheitas
 - Cadastre cada lavoura num talhão: cultura, safra, data de plantio e previsão de colheita.
 - Avance a situação com um toque (*Registrar plantio* → *Iniciar colheita* → *Concluir*). Tudo fica no histórico, com quem fez e quando.
 - **A colheita começa sozinha:** quando a colheitadeira com rastreador liga a plataforma dentro do talhão, o app marca a lavoura como *em colheita*.
@@ -38,11 +52,11 @@
 - Acompanhe quanto falta para colher e a produtividade em **sacas por hectare**.
 - Ao **concluir** uma colheita, a produção **entra sozinha no estoque** do produto escolhido.
 
-### 🚜 Frota
+### Frota
 - Tratores, colheitadeiras, pulverizadores, caminhões e utilitários num só lugar.
 - Atualize o horímetro (ou o odômetro) e a data da próxima revisão. O app destaca as revisões que vencem em até 7 dias.
 
-### 📡 Campo IoT
+### Campo conectado (IoT)
 - Veja em tempo real os sensores da fazenda: **estação meteorológica**, **umidade do solo** nos talhões, **nível e temperatura dos silos** e o **rastreador da colheitadeira** (posição, velocidade e trajeto).
 - Receba alertas de **risco de geada**, **solo seco** (hora de irrigar), **grão aquecendo no silo** (acionar aeração) e **bateria fraca**.
 - **Silo × estoque**: o app compara o grão que o sensor mede dentro do silo com o que está lançado no estoque e avisa quando a diferença passa de 10%. Assim dá para descobrir perdas ou saídas que ninguém registrou.
@@ -59,7 +73,7 @@ O GreenAgri foi feito para quem trabalha onde o sinal cai.
 
 1. **Abra o app pelo menos uma vez com internet.** Ele guarda as telas e os últimos dados no aparelho.
 2. **Sem sinal, continue usando normalmente.** O selo no topo mostra **Offline** e quantos lançamentos estão esperando.
-3. **Os lançamentos ficam salvos no aparelho** e o saldo na tela já considera o que você lançou (com o aviso *não sincronizado*).
+3. **Os lançamentos ficam salvos no aparelho** e o saldo na tela já considera o que você lançou (com o selo *Na fila*).
 4. **Quando o sinal volta, tudo é enviado sozinho**, na ordem em que foi feito. Não precisa repetir nada, e nada é lançado em dobro.
 
 Se o servidor recusar algum lançamento (por exemplo, uma saída maior que o saldo real), ele aparece em **Sincronização**, com o motivo. Ali você pode tentar de novo ou descartar.
@@ -125,5 +139,5 @@ docker compose up --build
 **Tecnologias:** Java 21 · Spring Boot 3.5 · Spring Security (JWT) · JPA · Flyway · PostgreSQL/H2 · React 18 · TypeScript · Vite · Tailwind CSS · TanStack Query · IndexedDB (Dexie) · Workbox (PWA) · Recharts · Leaflet + OpenStreetMap · ESP32 + GNSS (C++/PlatformIO) · Docker · GitHub Actions
 
 <p align="center">
-  <img src="docs/img/desktop-painel.png" width="760" alt="Painel no computador">
+  <img src="docs/img/desktop-login.png" width="760" alt="Tela de entrada com fotos do campo">
 </p>

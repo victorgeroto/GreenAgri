@@ -26,7 +26,7 @@ export function TrajetoMapa({ leituras, talhoes }: { leituras: Leitura[]; talhoe
   const ultima = pontos.at(-1)
 
   return (
-    <figure className="relative isolate h-80 overflow-hidden rounded-2xl border border-stone-200 lg:col-span-2" aria-label="Trajeto da máquina no mapa">
+    <figure className="relative isolate h-80 overflow-hidden rounded-lg border border-stone-200 lg:col-span-2" aria-label="Trajeto da máquina no mapa">
       <MapContainer center={trajeto[0] ?? [-24.88, -53.56]} zoom={15} className="h-full w-full">
         <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" maxZoom={19} />
         {talhoes.filter((t) => t.geometria).map((t) => (

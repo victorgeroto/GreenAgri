@@ -83,7 +83,7 @@ export function MapaFazenda({ talhoes, porTalhao, dispositivos, selecionado, onS
   const maquinas = dispositivos.filter((d) => d.tipo === 'RASTREADOR_MAQUINA')
 
   return (
-    <div className="relative isolate h-[62vh] min-h-[420px] overflow-hidden rounded-2xl border border-stone-200 lg:h-[calc(100vh-15rem)]">
+    <div className="relative isolate h-[62vh] min-h-[420px] overflow-hidden rounded-lg border border-stone-200 lg:h-[calc(100vh-15rem)]">
       <MapContainer center={SEDE} zoom={14} className="h-full w-full" scrollWheelZoom>
         <LayersControl position="topright">
           <LayersControl.BaseLayer checked name="Mapa (OpenStreetMap)">
@@ -169,7 +169,7 @@ export function MapaFazenda({ talhoes, porTalhao, dispositivos, selecionado, onS
       {/* Barra de desenho */}
       <div className="absolute left-14 top-3 z-[1000] flex flex-wrap gap-2">
         {desenho ? (
-          <div className="flex items-center gap-1 rounded-xl bg-white p-1 shadow-md">
+          <div className="flex items-center gap-1 rounded-md bg-white p-1 shadow-md">
             <span className="px-2 text-xs text-stone-600">
               {desenho.length < 3 ? 'Toque nos vértices do talhão' : `${desenho.length} pontos · ${fmtNumero(Math.round(areaHa(desenho) * 10) / 10)} ha`}
             </span>
@@ -195,7 +195,7 @@ export function MapaFazenda({ talhoes, porTalhao, dispositivos, selecionado, onS
       </div>
 
       {/* Legenda: recolhida no celular para não cobrir o mapa */}
-      <details open={legendaAberta} className="absolute bottom-6 left-3 z-[1000] rounded-xl bg-white/95 p-2.5 text-xs shadow-md">
+      <details open={legendaAberta} className="absolute bottom-6 left-3 z-[1000] rounded-md bg-white/95 p-2.5 text-xs shadow-md">
         <summary className="cursor-pointer select-none font-medium text-stone-700">Status da lavoura</summary>
         <ul className="mt-1 space-y-1">
           {(Object.keys(COR_STATUS) as (keyof typeof COR_STATUS)[]).map((s) => (

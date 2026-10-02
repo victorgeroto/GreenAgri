@@ -1,141 +1,179 @@
 import { clsx } from 'clsx'
-import { AlertTriangle, ArrowLeftRight, BellRing, ChevronRight, Package, Radio, Tractor, Wheat, type LucideIcon } from 'lucide-react'
+import { ArrowLeftRight, ArrowRight, BellRing, ChevronRight, Droplets, Package, Radio, Thermometer, Tractor, Wheat } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
-import { Button, Card, Carregando, Erro, PageHeader } from '@/components/ui'
-import { diasAte, fmtData, fmtQtd } from '@/lib/format'
-import type { ResumoDashboard } from '@/lib/types'
+import { Carrossel } from '@/components/Carrossel'
+import { ImagemProduto } from '@/components/ImagemProduto'
+import { FAZENDA } from '@/components/Layout'
+import { Badge, Button, Carregando, Erro, Indicador, Indicadores, PageHeader, Painel as Bloco } from '@/components/ui'
+import { diasAte, fmtData, fmtNumero, fmtQtd, fmtRelativo, hojeISO, safraDe, STATUS_COLHEITA } from '@/lib/format'
+import type { Colheita, Dispositivo, ResumoDashboard } from '@/lib/types'
 import { useDados } from '@/offline/hooks'
 import { Reconciliacao } from './campo/componentes'
 import { useProdutos } from './estoque/hooks'
 import { MovimentacaoItem } from './estoque/MovimentacaoItem'
 import { MovimentarSheet } from './estoque/MovimentarSheet'
 
-function Indicador({ to, icon: Icon, rotulo, valor, detalhe, alerta }: { to: string; icon: LucideIcon; rotulo: string; valor: ReactNode; detalhe: string; alerta?: boolean }) {
+function VerTudo({ to, children = 'Ver tudo' }: { to: string; children?: ReactNode }) {
   return (
-    <Link to={to} className="group min-w-0">
-      <Card className="h-full transition-shadow group-hover:shadow-md">
-        <div className="mb-3 flex items-center justify-between">
-          <span className="rounded-xl bg-brand-50 p-2 text-brand-800">
-            <Icon className="h-5 w-5" aria-hidden />
-          </span>
-          <ChevronRight className="h-4 w-4 text-stone-300 group-hover:text-stone-500" />
-        </div>
-        <p className="text-sm text-stone-500">{rotulo}</p>
-        <p className="text-2xl font-semibold tabular-nums">{valor}</p>
-        <p className={clsx('mt-0.5 flex items-center gap-1 text-xs', alerta ? 'font-medium text-amber-700' : 'text-stone-500')}>
-          {alerta && <AlertTriangle className="h-3.5 w-3.5" aria-hidden />}
-          {detalhe}
-        </p>
-      </Card>
+    <Link to={to} className="inline-flex shrink-0 items-center gap-1 text-[13px] font-medium text-brand-700 hover:text-brand-900">
+      {children} <ArrowRight className="h-3.5 w-3.5" />
     </Link>
   )
 }
 
-function Secao({ titulo, link, children }: { titulo: string; link: string; children: ReactNode }) {
+/** Dado sobreposto às fotos do campo. */
+function DadoHero({ rotulo, valor, icon: Icon }: { rotulo: string; valor: ReactNode; icon?: typeof Thermometer }) {
   return (
-    <Card>
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="font-semibold">{titulo}</h2>
-        <Link to={link} className="text-sm font-medium text-brand-700 hover:underline">
-          Ver tudo
-        </Link>
-      </div>
-      {children}
-    </Card>
+    <div className="min-w-0">
+      <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-white/60">
+        {Icon && <Icon className="h-3 w-3" aria-hidden />} {rotulo}
+      </p>
+      <p className="truncate text-lg font-semibold tabular-nums sm:text-xl">{valor}</p>
+    </div>
   )
 }
 
 export default function Painel() {
   const { usuario } = useAuth()
   const { data: r, isLoading, error, refetch } = useDados<ResumoDashboard>('/dashboard', { refetchInterval: 60_000 })
+  const { data: dispositivos = [] } = useDados<Dispositivo[]>('/iot/dispositivos', { refetchInterval: 60_000 })
+  const { data: colheitas = [] } = useDados<Colheita[]>('/colheitas')
   const { produtos } = useProdutos()
   const [lancando, setLancando] = useState(false)
 
   if (isLoading) return <Carregando />
   if (error || !r) return <Erro erro={error} onTentar={refetch} />
 
+  const estacao = dispositivos.find((d) => d.tipo === 'ESTACAO_METEOROLOGICA')
+  const emCampo = colheitas.filter((c) => c.status === 'EM_DESENVOLVIMENTO' || c.status === 'EM_COLHEITA')
+  const areaEmCampo = emCampo.reduce((s, c) => s + c.areaHa, 0)
+  const colhendo = colheitas.filter((c) => c.status === 'EM_COLHEITA')
+  // Safra corrente = a das lavouras em campo (em out/2026 o trigo ainda é da 2025/26).
+  const safraAtual = emCampo.map((c) => c.safra).sort()[0] ?? safraDe(hojeISO())
+
   return (
     <>
       <PageHeader
-        titulo={`Bom trabalho, ${usuario?.nome.split(' ')[0]}`}
-        subtitulo={new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+        sobretitulo={new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        titulo="Visão geral"
+        subtitulo={`Olá, ${usuario?.nome.split(' ')[0]}. Resumo da operação de hoje.`}
         acoes={<Button icon={ArrowLeftRight} onClick={() => setLancando(true)}>Lançar no estoque</Button>}
       />
 
-      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Indicador to="/estoque" icon={Package} rotulo="Produtos" valor={r.produtos} detalhe={r.estoqueBaixo.length ? `${r.estoqueBaixo.length} abaixo do mínimo` : 'Estoque em dia'} alerta={r.estoqueBaixo.length > 0} />
-        <Indicador to="/colheitas" icon={Wheat} rotulo="Colheitas em aberto" valor={r.colheitasAbertas} detalhe={r.proximasColheitas[0] ? `próxima: ${r.proximasColheitas[0].cultura} em ${fmtData(r.proximasColheitas[0].previsaoColheita)}` : 'Nenhuma prevista'} />
-        <Indicador to="/frota" icon={Tractor} rotulo="Máquinas na oficina" valor={r.veiculosEmManutencao} detalhe={`${r.manutencoesPendentes} revisão(ões) em até 7 dias`} alerta={r.manutencoesPendentes > 0} />
-        <Indicador to="/campo" icon={Radio} rotulo="Sensores online" valor={`${r.dispositivosOnline}/${r.dispositivos}`} detalhe={r.alertasIotAbertos ? `${r.alertasIotAbertos} alerta(s) em aberto` : 'Sem alertas'} alerta={r.alertasIotAbertos > 0} />
-      </div>
+      <Carrossel className="mb-5 h-[400px] rounded-lg sm:h-[340px]">
+        <div className="max-w-3xl">
+          <p className="text-xs font-medium text-white/70">
+            {FAZENDA.nome} · {FAZENDA.local}
+          </p>
+          <p className="mt-0.5 text-xl font-semibold tracking-tight sm:text-2xl">Safra {safraAtual}</p>
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-white/15 pt-3 sm:grid-cols-4">
+            <DadoHero rotulo="Em campo" valor={`${fmtNumero(Math.round(areaEmCampo))} ha`} />
+            <DadoHero rotulo="Colhendo agora" valor={colhendo.length ? colhendo.map((c) => c.talhao).join(', ') : 'Nenhum talhão'} />
+            <DadoHero rotulo="Temperatura" icon={Thermometer} valor={estacao?.ultimaLeitura?.temperatura != null ? `${fmtNumero(estacao.ultimaLeitura.temperatura)} °C` : '—'} />
+            <DadoHero rotulo="Umidade do ar" icon={Droplets} valor={estacao?.ultimaLeitura?.umidadeAr != null ? `${fmtNumero(Math.round(estacao.ultimaLeitura.umidadeAr))}%` : '—'} />
+          </div>
+          {estacao && <p className="mt-2 text-[11px] text-white/55">Estação {estacao.codigo} · atualizado {fmtRelativo(estacao.ultimoContato)}</p>}
+        </div>
+      </Carrossel>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Secao titulo="Repor estoque" link="/estoque">
+      <Indicadores className="mb-5">
+          <Indicador to="/estoque" icon={Package} rotulo="Produtos em estoque" valor={r.produtos} detalhe={r.estoqueBaixo.length ? `${r.estoqueBaixo.length} abaixo do mínimo` : 'Todos acima do mínimo'} alerta={r.estoqueBaixo.length > 0} />
+        <Indicador
+          to="/colheitas"
+          icon={Wheat}
+          rotulo="Lavouras em aberto"
+          valor={r.colheitasAbertas}
+          detalhe={r.proximasColheitas[0] ? `Próxima: ${r.proximasColheitas[0].cultura}, ${fmtData(r.proximasColheitas[0].previsaoColheita)}` : 'Nenhuma prevista'}
+        />
+        <Indicador to="/frota" icon={Tractor} rotulo="Máquinas na oficina" valor={r.veiculosEmManutencao} detalhe={`${r.manutencoesPendentes} revisão(ões) em até 7 dias`} alerta={r.manutencoesPendentes > 0} />
+        <Indicador
+          to="/campo"
+          icon={Radio}
+          rotulo="Dispositivos online"
+          valor={
+            <>
+              {r.dispositivosOnline}
+              <span className="text-base font-normal text-stone-400"> / {r.dispositivos}</span>
+            </>
+          }
+          detalhe={r.alertasIotAbertos ? `${r.alertasIotAbertos} alerta(s) em aberto` : 'Sem alertas'}
+          alerta={r.alertasIotAbertos > 0}
+        />
+      </Indicadores>
+
+      {r.alertasIotAbertos > 0 && (
+        <Link to="/campo" className="mb-5 flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 hover:bg-amber-100/70">
+          <BellRing className="h-4 w-4 shrink-0" />
+          <span>
+            <strong className="font-semibold">{r.alertasIotAbertos} alerta(s)</strong> dos sensores de campo aguardando avaliação
+          </span>
+          <ChevronRight className="ml-auto h-4 w-4" />
+        </Link>
+      )}
+
+      <div className="grid items-start gap-5 lg:grid-cols-3">
+        <Bloco className="lg:col-span-2" titulo="Últimas movimentações de estoque" descricao={`${r.movimentacoes30d} lançamentos nos últimos 30 dias`} acao={<VerTudo to="/estoque" />} semPadding>
+          <ul className="divide-y divide-stone-100 px-4">
+            {r.ultimasMovimentacoes.map((m) => (
+              <MovimentacaoItem key={m.id} m={m} />
+            ))}
+          </ul>
+        </Bloco>
+
+        <Bloco titulo="Repor estoque" descricao="Abaixo do estoque mínimo" acao={<VerTudo to="/estoque" />} semPadding>
           {r.estoqueBaixo.length === 0 ? (
-            <p className="py-4 text-sm text-stone-500">Todos os produtos acima do mínimo.</p>
+            <p className="p-4 text-sm text-stone-500">Todos os produtos acima do mínimo.</p>
           ) : (
             <ul className="divide-y divide-stone-100">
               {r.estoqueBaixo.map((p) => (
                 <li key={p.id}>
-                  <Link to={`/estoque/${p.id}`} className="flex items-center justify-between gap-2 py-2.5 hover:text-brand-800">
-                    <span className="truncate text-sm">{p.nome}</span>
-                    <span className="shrink-0 text-sm tabular-nums">
-                      <strong className="text-red-600">{fmtQtd(p.quantidadeAtual, p.unidade)}</strong>
-                      <span className="text-stone-400"> / mín. {fmtQtd(p.estoqueMinimo, p.unidade)}</span>
+                  <Link to={`/estoque/${p.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-stone-50">
+                    <ImagemProduto produto={p} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-stone-800">{p.nome}</span>
+                      <span className="block text-xs tabular-nums text-stone-500">mínimo {fmtQtd(p.estoqueMinimo, p.unidade)}</span>
                     </span>
+                    <span className="text-sm font-semibold tabular-nums text-red-700">{fmtQtd(p.quantidadeAtual, p.unidade)}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           )}
-        </Secao>
+        </Bloco>
 
-        <Secao titulo="Silos monitorados" link="/campo">
+        <Bloco className="lg:col-span-2" titulo="Silos monitorados" descricao="Nível medido pelo sensor comparado ao saldo lançado" acao={<VerTudo to="/campo" />}>
           {r.silos.length === 0 ? (
-            <p className="py-4 text-sm text-stone-500">Nenhum silo com sensor de nível.</p>
+            <p className="text-sm text-stone-500">Nenhum silo com sensor de nível.</p>
           ) : (
-            <div className="space-y-3">
-              {r.silos.map((d) => d.silo && <Reconciliacao key={d.id} r={d.silo} />)}
-            </div>
+            <div className="grid gap-3 md:grid-cols-2">{r.silos.map((d) => d.silo && <Reconciliacao key={d.id} r={d.silo} />)}</div>
           )}
-        </Secao>
+        </Bloco>
 
-        <Secao titulo="Próximas colheitas" link="/colheitas">
+        <Bloco titulo="Próximas colheitas" acao={<VerTudo to="/colheitas" />} semPadding>
           <ul className="divide-y divide-stone-100">
             {r.proximasColheitas.map((c) => {
               const dias = diasAte(c.previsaoColheita)
               return (
-                <li key={c.id} className="flex items-center justify-between py-2.5 text-sm">
-                  <span>
-                    <strong>{c.cultura}</strong> <span className="text-stone-500">· talhão {c.talhao}</span>
-                  </span>
-                  <span className={dias <= 7 ? 'font-medium text-amber-700' : 'text-stone-500'}>
-                    {dias <= 0 ? 'hoje' : `em ${dias} dias`}
-                  </span>
+                <li key={c.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-stone-800">{c.cultura}</p>
+                    <p className="text-xs text-stone-500">
+                      Talhão {c.talhao} · {STATUS_COLHEITA[c.status]}
+                    </p>
+                  </div>
+                  <Badge tom={dias <= 7 ? 'amarelo' : 'neutro'}>{dias <= 0 ? 'Hoje' : `${dias} dias`}</Badge>
                 </li>
               )
             })}
           </ul>
-        </Secao>
-
-        <Secao titulo="Últimas movimentações" link="/estoque">
-          <ul className="divide-y divide-stone-100">
-            {r.ultimasMovimentacoes.map((m) => (
-              <MovimentacaoItem key={m.id} m={m} />
-            ))}
-          </ul>
-        </Secao>
+        </Bloco>
       </div>
 
-      {r.alertasIotAbertos > 0 && (
-        <Link to="/campo" className="mt-4 flex items-center gap-2 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
-          <BellRing className="h-5 w-5 shrink-0" />
-          {r.alertasIotAbertos} alerta(s) dos sensores de campo aguardando avaliação
-          <ChevronRight className="ml-auto h-4 w-4" />
-        </Link>
-      )}
+      <p className={clsx('mt-6 text-center text-xs text-stone-400')}>
+        Dados de demonstração · {FAZENDA.nome}
+      </p>
 
       <MovimentarSheet aberto={lancando} onFechar={() => setLancando(false)} produtos={produtos} />
     </>

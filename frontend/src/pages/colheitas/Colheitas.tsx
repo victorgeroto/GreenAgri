@@ -18,7 +18,7 @@ type Visao = 'mapa' | 'lista'
 
 export function StatusBadge({ c }: { c: Colheita }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-800">
+    <span className="inline-flex items-center gap-1.5 rounded bg-white px-1.5 py-0.5 text-xs font-medium text-stone-800 ring-1 ring-inset ring-stone-200">
       <span className="h-2 w-2 rounded-full" style={{ background: COR_STATUS[c.status] }} aria-hidden />
       {STATUS_COLHEITA[c.status]}
       {c.statusPendente && <CloudOff className="h-3 w-3 text-amber-600" aria-label="na fila" />}
@@ -105,11 +105,11 @@ function ColheitaCard({ c, onEditar, onConcluir }: { c: Colheita; onEditar: () =
       )}
 
       <dl className="grid grid-cols-2 gap-2 text-sm">
-        <div className="rounded-xl bg-stone-50 p-2">
+        <div className="rounded-md bg-stone-50 p-2">
           <dt className="text-xs text-stone-500">{concluida ? 'Produção' : 'Estimativa'}</dt>
           <dd className="font-semibold tabular-nums">{fmtNumero((concluida ? c.producaoRealKg : c.producaoEstimadaKg) ?? undefined)} kg</dd>
         </div>
-        <div className="rounded-xl bg-stone-50 p-2">
+        <div className="rounded-md bg-stone-50 p-2">
           <dt className="text-xs text-stone-500">Produtividade</dt>
           <dd className="font-semibold tabular-nums">{c.produtividadeSacasHa ? `${fmtNumero(c.produtividadeSacasHa)} sc/ha` : '—'}</dd>
         </div>
@@ -157,7 +157,7 @@ function PainelTalhao({ t, colheitas, filtro, onNova, onConcluir }: { t: Talhao;
           <h3 className={clsx('mb-1.5 text-xs font-semibold uppercase tracking-wide', filtro === safra ? 'text-brand-800' : 'text-stone-500')}>Safra {safra}</h3>
           <ul className="space-y-2">
             {lista.map((c) => (
-              <li key={c.id} className="rounded-xl border border-stone-200">
+              <li key={c.id} className="rounded-md border border-stone-200">
                 <button className="flex w-full items-center justify-between gap-2 p-3 text-left" onClick={() => setAberta(aberta === c.id ? undefined : c.id)} aria-expanded={aberta === c.id}>
                   <span>
                     <span className="block text-sm font-medium">{c.cultura}</span>
@@ -229,8 +229,8 @@ export default function Colheitas() {
               aria-checked={filtro === s}
               onClick={() => setFiltro(s)}
               className={clsx(
-                'shrink-0 rounded-full border px-3 py-1.5 text-sm transition-colors',
-                filtro === s ? 'border-brand-800 bg-brand-800 text-white' : 'border-stone-300 bg-white text-stone-700 hover:bg-stone-50',
+                'h-8 shrink-0 rounded-md px-3 text-[13px] font-medium ring-1 ring-inset transition-colors',
+                filtro === s ? 'bg-brand-700 text-white ring-brand-700' : 'bg-white text-stone-700 ring-stone-300 hover:bg-stone-50',
               )}
             >
               {s === 'agora' ? 'Em campo agora' : `Safra ${s}`}
