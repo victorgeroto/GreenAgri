@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: greenagri-api
+  profiles:
+    default: dev
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none # o schema é versionado pelo Flyway
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  jackson:
+    default-property-inclusion: non_null
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+greenagri:
+  jwt:
+    # Em produção defina GREENAGRI_JWT_SECRET com pelo menos 32 caracteres.
+    secret: ${GREENAGRI_JWT_SECRET:dev-secret-greenagri-trocar-em-producao-0123456789}
+    expiracao-horas: 12
+  cors:
+    origens: ${GREENAGRI_CORS_ORIGENS:http://localhost:5173,http://localhost:4173}
+  iot:
+    # Janela sem contato após a qual o dispositivo é exibido como offline.
+    minutos-offline: 30

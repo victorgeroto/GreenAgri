@@ -1,0 +1,8 @@
+[
+  { "identificacao": "TR-01", "modelo": "John Deere 6155J", "tipo": "TRATOR", "ano": 2021, "horimetro": 4210, "status": "EM_OPERACAO", "diasManutencao": 30, "observacoes": "Plantio talhão T-05" },
+  { "identificacao": "TR-02", "modelo": "Massey Ferguson MF 7725", "tipo": "TRATOR", "ano": 2019, "horimetro": 6890, "status": "MANUTENCAO", "diasManutencao": -2, "observacoes": "Troca da bomba hidráulica" },
+  { "identificacao": "CH-01", "modelo": "John Deere S550", "tipo": "COLHEITADEIRA", "ano": 2020, "horimetro": 3120, "status": "DISPONIVEL", "diasManutencao": 5, "observacoes": "Revisar plataforma antes da colheita do trigo" },
+  { "identificacao": "PV-01", "modelo": "Jacto Uniport 3030", "tipo": "PULVERIZADOR", "ano": 2022, "horimetro": 1850, "status": "DISPONIVEL", "diasManutencao": 60 },
+  { "identificacao": "RHK4F21", "modelo": "Volvo FH 540 graneleiro", "tipo": "CAMINHAO", "ano": 2018, "horimetro": 412500, "status": "EM_OPERACAO", "diasManutencao": 15, "observacoes": "Horímetro em km" },
+  { "identificacao": "QPA8C93", "modelo": "Toyota Hilux SRX", "tipo": "UTILITARIO", "ano": 2023, "horimetro": 58200, "status": "DISPONIVEL", "diasManutencao": 90, "observacoes": "Horímetro em km" }
+]

@@ -1,0 +1,13 @@
+[
+  { "sku": "GR-SOJA-01", "nome": "Soja em grão (safra 25/26)", "categoria": "GRAOS", "unidade": "SACA", "estoqueMinimo": 500, "saldoInicial": 5150, "localizacao": "Silo 1", "descricao": "Soja comercial seca a 13% de umidade", "imagem": "/img/produtos/soja.jpg" },
+  { "sku": "GR-MILHO-01", "nome": "Milho em grão", "categoria": "GRAOS", "unidade": "SACA", "estoqueMinimo": 800, "saldoInicial": 3000, "localizacao": "Silo 2", "descricao": "Milho safrinha para venda e trato animal", "imagem": "/img/produtos/milho.jpg" },
+  { "sku": "GR-TRIGO-01", "nome": "Trigo pão", "categoria": "GRAOS", "unidade": "SACA", "estoqueMinimo": 200, "saldoInicial": 362, "localizacao": "Armazém A", "descricao": "Trigo classe pão, PH 78", "imagem": "/img/produtos/trigo.jpg" },
+  { "sku": "SE-SOJA-01", "nome": "Semente de soja RR2 PRO", "categoria": "SEMENTES", "unidade": "SACA", "estoqueMinimo": 100, "saldoInicial": 200, "localizacao": "Armazém B - câmara fria", "descricao": "Sacas de 40 kg, tratadas", "imagem": "/img/produtos/semente-soja.jpg" },
+  { "sku": "FE-NPK-01", "nome": "Fertilizante NPK 04-14-08", "categoria": "FERTILIZANTES", "unidade": "TONELADA", "estoqueMinimo": 10, "saldoInicial": 37, "localizacao": "Galpão de insumos", "descricao": "Adubação de base" },
+  { "sku": "FE-UREIA-01", "nome": "Ureia 45% N", "categoria": "FERTILIZANTES", "unidade": "TONELADA", "estoqueMinimo": 8, "saldoInicial": 15, "localizacao": "Galpão de insumos", "descricao": "Adubação de cobertura" },
+  { "sku": "DF-GLIFO-01", "nome": "Herbicida glifosato 480 SL", "categoria": "DEFENSIVOS", "unidade": "LITRO", "estoqueMinimo": 200, "saldoInicial": 800, "localizacao": "Depósito de defensivos", "descricao": "Uso conforme receituário agronômico" },
+  { "sku": "DF-FUNG-01", "nome": "Fungicida azoxistrobina + ciproconazol", "categoria": "DEFENSIVOS", "unidade": "LITRO", "estoqueMinimo": 50, "saldoInicial": 120, "localizacao": "Depósito de defensivos", "descricao": "Controle de ferrugem asiática" },
+  { "sku": "CB-DIESEL-01", "nome": "Óleo diesel S10", "categoria": "COMBUSTIVEL", "unidade": "LITRO", "estoqueMinimo": 3000, "saldoInicial": 3000, "localizacao": "Tanque aéreo 15 mil L", "descricao": "Abastecimento da frota" },
+  { "sku": "RA-BOV-01", "nome": "Ração bovina engorda", "categoria": "RACAO", "unidade": "KG", "estoqueMinimo": 2000, "saldoInicial": 7000, "localizacao": "Fábrica de ração", "descricao": "Proteína 18%" },
+  { "sku": "PC-FILTRO-01", "nome": "Filtro de óleo do motor (JD RE504836)", "categoria": "PECAS", "unidade": "UNIDADE", "estoqueMinimo": 6, "saldoInicial": 16, "localizacao": "Oficina - prateleira 3", "descricao": "Compatível com tratores série 6J" }
+]
