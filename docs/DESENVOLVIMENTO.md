@@ -150,3 +150,23 @@ src/
 ### Design responsivo
 
 Mobile-first com Tailwind, tipografia Inter (empacotada localmente, funciona offline), paleta neutra com verde só nas ações principais: barra de navegação inferior e formulários em *bottom sheet* no celular, menu lateral e diálogos centralizados a partir de `lg`. Os campos numéricos usam `inputMode="decimal"` para abrir o teclado numérico, e os botões têm 40 px de altura no celular.
+
+## Fluxo de trabalho com Git
+
+O repositório segue o **GitFlow** com mensagens no padrão **Conventional Commits**, em inglês.
+
+| Branch | Uso |
+|---|---|
+| `main` | Versões publicadas. Cada merge vem de uma `release/*` (ou `hotfix/*`) e recebe uma tag `vX.Y.Z`. |
+| `develop` | Integração do que vai para a próxima versão. |
+| `feature/*` | Uma funcionalidade, criada a partir da `develop` e integrada com `git merge --no-ff`. |
+| `release/X.Y.Z` | Preparação da versão (CHANGELOG, README). Vai para a `main` com tag e volta para a `develop`. |
+| `hotfix/*` | Correção urgente a partir da `main`, integrada na `main` e na `develop`. |
+
+Tipos de commit: `feat` (funcionalidade), `fix` (correção), `docs`, `chore` (build, CI, release), `refactor` e `test`, com escopo opcional (`backend`, `frontend`, `firmware`, `brand`). Exemplos:
+
+```
+feat(frontend): add field team screen and machine assignment
+fix(backend): build assignment responses inside the transaction
+docs: document the field team and refresh screenshots
+```
