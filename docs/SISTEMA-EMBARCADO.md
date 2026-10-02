@@ -1,6 +1,6 @@
 # Campo Conectado — sistema embarcado do GreenAgri
 
-A área **Campo IoT** do GreenAgri liga o sistema de gestão a dispositivos instalados na fazenda: estação meteorológica, sensores de umidade do solo nos talhões e sensores de nível e temperatura nos silos. Ela foi pensada para mostrar, num projeto só, as competências que vagas de sistemas embarcados no agro pedem: firmware de baixo consumo, comunicação em campo com sinal ruim, protocolo de dados enxuto e integração com o negócio (estoque e produção).
+A área **Campo IoT** do GreenAgri liga o sistema de gestão a dispositivos instalados na fazenda: estação meteorológica, sensores de umidade do solo nos talhões, sensores de nível e temperatura nos silos e um rastreador GNSS na colheitadeira. Ela foi pensada para mostrar, num projeto só, as competências que vagas de sistemas embarcados no agro pedem: firmware de baixo consumo, comunicação em campo com sinal ruim, protocolo de dados enxuto e integração com o negócio (estoque e produção).
 
 ## O problema que resolve
 
@@ -11,8 +11,50 @@ A área **Campo IoT** do GreenAgri liga o sistema de gestão a dispositivos inst
 | Grão armazenado esquenta, fermenta e perde valor | O cabo termométrico do silo alerta acima de 30 °C (acionar aeração) |
 | O estoque do sistema não bate com o silo | O nível medido é convertido em kg e comparado com o saldo registrado |
 | Sinal de celular/Wi-Fi intermitente no talhão | O firmware guarda as leituras e envia em lote quando o sinal volta |
+| Ninguém atualiza o sistema quando a colheita começa | O rastreador da colheitadeira detecta a máquina trabalhando dentro do talhão e muda o status sozinho |
 
-O último ponto é a parte que mais se destaca: a **reconciliação silo × estoque**. O sensor ultrassônico mede o nível, o backend converte para kg usando a capacidade do silo e compara com o saldo do produto vinculado. Uma diferença acima de 10% aparece no painel. Ela indica perda, desvio ou uma saída que ninguém lançou. Nos dados de demonstração, o Silo 2 mostra −15%.
+Dois recursos se destacam:
+
+- **Reconciliação silo × estoque.** O sensor ultrassônico mede o nível, o backend converte para kg usando a capacidade do silo e compara com o saldo do produto vinculado. Uma diferença acima de 10% aparece no painel. Ela indica perda, desvio ou uma saída que ninguém lançou. Nos dados de demonstração, o Silo 2 mostra −15%.
+- **Geofence de talhões.** Cada talhão é um polígono desenhado no mapa. Quando a colheitadeira envia posições com a plataforma de corte ligada dentro de um talhão com lavoura em desenvolvimento, a colheita passa para **"Em colheita"**. A mudança fica no histórico com a origem *dispositivo*, o horário e o ponto do GPS.
+
+## Rastreador de máquina + geofence
+
+<p align="center"><img src="img/desktop-rastreador.png" width="720" alt="Trajeto da colheitadeira sobre o talhão T-04"></p>
+
+**Hardware:** ESP32 + receptor GNSS (NEO-6M ou NEO-M8N) + entrada digital isolada por optoacoplador. A entrada recebe o sinal da plataforma de corte, vindo de um sensor indutivo no eixo ou da saída do controlador da máquina. A placa é alimentada pelos 12 V da máquina através de um regulador buck, então não precisa de deep sleep.
+
+**Firmware** (`firmware/esp32-sensor/src/rastreador.cpp`, ambiente `pio run -e rastreador`):
+
+- **Taxa adaptativa:** um ponto a cada 15 s operando, 60 s em deslocamento e 5 min parada.
+- **Envio por evento:** ligar ou desligar a plataforma gera um ponto e um envio imediatos, porque é o evento que o geofence procura.
+- **Horário do próprio GNSS (UTC)**, sem depender de NTP no campo.
+- **Buffer de 400 pontos** (~1h40 operando sem sinal), esvaziado em lotes de 50 quando a conexão volta.
+- **Debounce** da entrada da plataforma (maioria em 5 leituras).
+
+**Backend** (`GeofenceService`):
+
+1. Para cada lote, percorre as leituras em ordem cronológica.
+2. Uma leitura com `op: true` e posição válida é testada contra os polígonos dos talhões (*ray casting* em `Poligono.contem`).
+3. Se o talhão tem lavoura **em desenvolvimento**, ela passa para **em colheita**. O evento usa o horário e o ponto da **primeira** leitura dentro do talhão, então um lote atrasado (store-and-forward) mantém o horário real.
+4. O status nunca volta e cada talhão é processado uma vez por lote, então reenvios não geram eventos duplicados.
+5. Uma máquina "disponível" que começa a operar passa a "em operação" na **Frota**.
+6. Receptores sem fix costumam enviar `0,0`. Essas leituras são tratadas como posição desconhecida.
+
+**Protocolo:** o mesmo lote das demais leituras, com `lat`, `lon`, `vel` (km/h) e `op` (implemento operando):
+
+```json
+{ "codigo": "RAST-CH01", "leituras": [ { "ts": 1790902401, "lat": -24.87861, "lon": -53.54892, "vel": 6.5, "op": true } ] }
+```
+
+**Mapa (Leaflet + OpenStreetMap, gratuito e sem chave de API):**
+
+- Talhões coloridos pelo status da lavoura, com rótulo por extenso (a cor nunca é a única pista).
+- Filtro **Em campo agora** / **por safra** para separar as áreas de cada ano-safra e a rotação de culturas (ex.: soja → milho safrinha no T-02).
+- Sensores e máquinas como camadas que podem ser ligadas e desligadas. A colheitadeira aparece com o trajeto das últimas 3 h, e os trechos operando ficam destacados.
+- Desenho de talhão novo tocando os vértices no mapa, com a área calculada na hora (a mesma conta do backend).
+- Camada de satélite opcional (Esri World Imagery). Verifique os termos de uso da Esri antes de usar comercialmente.
+- Imagens do mapa já vistas ficam em cache no service worker. Respeitando a [política de uso do OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/), não há pré-download em massa.
 
 ## Arquitetura
 
@@ -74,6 +116,8 @@ X-Device-Key: <chave do dispositivo>
 | Cabo com DS18B20 em vários pontos | Termometria do silo | R$ 60 |
 | Bateria 18650 + painel solar de 6 V + carregador CN3791 | Energia autônoma | R$ 70 |
 | Caixa IP65 + prensa-cabos | Proteção | R$ 40 |
+| Receptor GNSS NEO-M8N + antena externa | Rastreador da máquina | R$ 90 |
+| Regulador buck 12 V → 5 V + optoacoplador PC817 | Alimentação e leitura da plataforma | R$ 20 |
 
 Os custos são estimativas de referência e variam por fornecedor.
 
@@ -86,6 +130,7 @@ Os custos são estimativas de referência e variam por fornecedor.
 node firmware/simulador/simulador.mjs --intervalo 5 --queda 0.3
 node firmware/simulador/simulador.mjs --cenario geada        # dispara alerta crítico
 node firmware/simulador/simulador.mjs --cenario silo-quente  # aquecimento do grão
+node firmware/simulador/simulador.mjs --talhao T-04          # colheitadeira vai até o talhão e inicia a colheita
 ```
 
 O simulador usa o mesmo protocolo do firmware, inclusive as quedas de sinal com buffer.
@@ -100,4 +145,5 @@ Em ordem de valor para o produto e para o portfólio:
 4. **OTA seguro** (`esp_https_ota`): o firmware já informa a versão em cada lote, então o backend pode ofertar atualizações.
 5. **MQTT** (Mosquitto/EMQX) como alternativa ao HTTP, com QoS 1 e sessões persistentes.
 6. **Robustez**: tarefas FreeRTOS, watchdog, detecção de brownout, secure boot e criptografia de flash, TLS com pinning de certificado.
-7. **GNSS** nas máquinas para rastreio e mapa de operações por talhão.
+7. **Mapa de produtividade**: somar ao rastreador o sensor de fluxo de grãos da colheitadeira e gerar um mapa de rendimento (kg/ha) por talhão, a base da agricultura de precisão.
+8. **Geofence na borda**: enviar os polígonos ao rastreador para ele decidir sozinho a entrada no talhão, mesmo sem sinal.
