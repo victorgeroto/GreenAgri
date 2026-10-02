@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.greenagri.colheita.ColheitaDtos.ColheitaResponse;
 import com.greenagri.colheita.ColheitaRepository;
 import com.greenagri.colheita.StatusColheita;
+import com.greenagri.equipe.EquipeService;
+import com.greenagri.equipe.Situacao;
 import com.greenagri.estoque.EstoqueDtos.MovimentacaoResponse;
 import com.greenagri.estoque.MovimentacaoRepository;
 import com.greenagri.frota.StatusVeiculo;
@@ -40,12 +42,14 @@ public class DashboardController {
 	private final VeiculoRepository veiculos;
 	private final AlertaRepository alertas;
 	private final IotService iotService;
+	private final EquipeService equipeService;
 
 	public record Resumo(
 			long produtos, List<ProdutoResponse> estoqueBaixo, long movimentacoes30d,
 			List<MovimentacaoResponse> ultimasMovimentacoes, long colheitasAbertas,
 			List<ColheitaResponse> proximasColheitas, long veiculosEmManutencao, long manutencoesPendentes,
-			long dispositivosOnline, long dispositivos, long alertasIotAbertos, List<DispositivoResponse> silos) {
+			long dispositivosOnline, long dispositivos, long alertasIotAbertos, List<DispositivoResponse> silos,
+			long operadoresDisponiveis, long operadoresEmAtividade, long operadores) {
 	}
 
 	@GetMapping
@@ -53,6 +57,7 @@ public class DashboardController {
 	@Operation(summary = "Indicadores consolidados da fazenda")
 	public Resumo resumo() {
 		List<DispositivoResponse> disp = iotService.listarDispositivos();
+		var equipe = equipeService.listar();
 		return new Resumo(
 				produtos.count(),
 				produtos.findAbaixoDoMinimo().stream().map(ProdutoResponse::de).toList(),
@@ -70,6 +75,9 @@ public class DashboardController {
 				disp.stream().filter(DispositivoResponse::online).count(),
 				disp.size(),
 				alertas.countByReconhecidoFalse(),
-				disp.stream().filter(d -> d.silo() != null).toList());
+				disp.stream().filter(d -> d.silo() != null).toList(),
+				equipe.stream().filter(o -> o.situacao() == Situacao.DISPONIVEL).count(),
+				equipe.stream().filter(o -> o.situacao() == Situacao.EM_ATIVIDADE).count(),
+				equipe.size());
 	}
 }

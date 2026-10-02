@@ -1,0 +1,5 @@
+package com.greenagri.equipe;
+
+public enum Funcao {
+	OPERADOR_MAQUINAS, TRATORISTA, MOTORISTA, MECANICO, TECNICO_AGRICOLA, AUXILIAR_CAMPO
+}
