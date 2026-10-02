@@ -56,18 +56,24 @@ public class EquipeService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Alocacao> emAndamento() {
-		return alocacoes.findByEncerradaEmIsNullOrderByInicioAsc();
+	public List<AlocacaoResponse> emAndamento() {
+		return alocacoes.findByEncerradaEmIsNullOrderByInicioAsc().stream().map(AlocacaoResponse::de).toList();
 	}
 
 	@Transactional(readOnly = true)
-	public List<Alocacao> historico(Long operadorId) {
+	public List<AlocacaoResponse> historico(Long operadorId) {
 		operadores.findById(operadorId).orElseThrow(() -> new RecursoNaoEncontradoException("Operador", operadorId));
-		return alocacoes.findTop30ByOperadorIdOrderByInicioDesc(operadorId);
+		return alocacoes.findTop30ByOperadorIdOrderByInicioDesc(operadorId).stream().map(AlocacaoResponse::de).toList();
+	}
+
+	/** Devolve o DTO montado dentro da transação (as associações são carregadas sob demanda). */
+	@Transactional
+	public AlocacaoResponse alocar(AlocacaoRequest req, String responsavel) {
+		return AlocacaoResponse.de(criarAlocacao(req, responsavel));
 	}
 
 	@Transactional
-	public Alocacao alocar(AlocacaoRequest req, String responsavel) {
+	public Alocacao criarAlocacao(AlocacaoRequest req, String responsavel) {
 		if (req.idCliente() != null) {
 			var existente = alocacoes.findByIdCliente(req.idCliente());
 			if (existente.isPresent()) {
@@ -124,10 +130,10 @@ public class EquipeService {
 
 	/** Encerra a atividade e libera a máquina. Encerrar duas vezes não tem efeito (seguro para a fila offline). */
 	@Transactional
-	public Alocacao encerrar(Long id) {
+	public AlocacaoResponse encerrar(Long id) {
 		Alocacao a = alocacoes.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Alocação", id));
 		if (!a.emAndamento()) {
-			return a;
+			return AlocacaoResponse.de(a);
 		}
 		a.setEncerradaEm(Instant.now());
 		Veiculo v = a.getVeiculo();
@@ -138,7 +144,7 @@ public class EquipeService {
 				v.setStatus(StatusVeiculo.DISPONIVEL);
 			}
 		}
-		return a;
+		return AlocacaoResponse.de(a);
 	}
 
 	private Veiculo validarMaquina(AlocacaoRequest req, Operador operador) {

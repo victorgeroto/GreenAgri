@@ -68,7 +68,7 @@ class EquipeSeed {
 			AlocacaoSeed a = s.alocacao();
 			if (a != null) {
 				// Passa pelas regras reais de alocação (habilitação, máquina livre, status da máquina).
-				Alocacao alocacao = equipeService.alocar(new AlocacaoRequest(o.getId(), a.atividade(),
+				Alocacao alocacao = equipeService.criarAlocacao(new AlocacaoRequest(o.getId(), a.atividade(),
 						a.veiculo() == null ? null : veiculos.get(a.veiculo()).getId(),
 						a.talhao() == null ? null : talhoes.get(a.talhao()).getId(), a.descricao(),
 						a.horasPrevistas() == null ? null : agora.plus(Duration.ofHours(a.horasPrevistas() - a.horasAtras())),
