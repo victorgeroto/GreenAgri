@@ -1,92 +1,112 @@
 # 🌱 GreenAgri
 
-## 🚀 Sobre o Projeto
+**Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e receba alertas dos sensores instalados no campo, tudo num só app.
 
-O **GreenAgri** é uma solução digital desenvolvida para otimizar a gestão agrícola, conectando tecnologia e sustentabilidade. A plataforma foi projetada para oferecer controle eficiente de operações, organização de dados e apoio à tomada de decisão no setor agro.
-
-Com uma arquitetura moderna, o projeto integra um **backend robusto em Java** com um **frontend dinâmico em JavaScript**, proporcionando uma experiência fluida, escalável e de alto desempenho.
-
----
-
-## 🎯 Objetivo
-
-O principal objetivo do GreenAgri é:
-
-- Melhorar a eficiência operacional no campo  
-- Centralizar informações importantes da produção  
-- Facilitar o acompanhamento e gestão de atividades agrícolas  
-- Apoiar decisões estratégicas com base em dados  
+<p align="center">
+  <img src="docs/img/mobile-painel.png" width="230" alt="Painel no celular">
+  <img src="docs/img/mobile-estoque-offline.png" width="230" alt="Lançamento de estoque feito offline">
+  <img src="docs/img/mobile-campo.png" width="230" alt="Sensores de campo">
+</p>
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## O que dá para fazer
 
-### 🔙 Backend
-- Java  
-- APIs REST  
-- Arquitetura orientada a serviços  
+### 📦 Estoque
+- Veja o saldo de cada produto (sacas, toneladas, litros, kg ou unidades) e quanto falta para o **estoque mínimo**.
+- Registre **entradas** (compras, colheita), **saídas** (vendas, plantio, abastecimento) e **inventários** (contagem física).
+- O app **não deixa a saída passar do que existe**: se faltar produto, ele avisa antes de salvar.
+- Cada produto tem um **histórico completo**: quem lançou, quando e por quê.
 
-### 🔜 Frontend
-- JavaScript  
-- Interface web interativa  
-- Integração com APIs  
+### 🌾 Colheitas
+- Cadastre cada safra por talhão: cultura, área, data de plantio e previsão de colheita.
+- Acompanhe quanto falta para colher e a produtividade em **sacas por hectare**.
+- Ao **concluir** uma colheita, a produção **entra sozinha no estoque** do produto escolhido.
 
----
+### 🚜 Frota
+- Tratores, colheitadeiras, pulverizadores, caminhões e utilitários num só lugar.
+- Atualize o horímetro (ou o odômetro) e a data da próxima revisão. O app destaca as revisões que vencem em até 7 dias.
 
-## ⚙️ Funcionalidades
+### 📡 Campo IoT
+- Veja em tempo real os sensores da fazenda: **estação meteorológica**, **umidade do solo** nos talhões e **nível e temperatura dos silos**.
+- Receba alertas de **risco de geada**, **solo seco** (hora de irrigar), **grão aquecendo no silo** (acionar aeração) e **bateria fraca**.
+- **Silo × estoque**: o app compara o grão que o sensor mede dentro do silo com o que está lançado no estoque e avisa quando a diferença passa de 10%. Assim dá para descobrir perdas ou saídas que ninguém registrou.
 
-- 📊 Gestão de dados agrícolas  
-- 📁 Organização de informações de produção  
-- 🔗 Integração entre frontend e backend  
-- 📈 Base para análise e monitoramento de atividades  
-- 🌐 Interface acessível via navegador  
-
----
-
-## 🧱 Arquitetura
-
-O projeto segue uma separação clara entre:
-
-- **Camada de Apresentação (Frontend)**  
-- **Camada de Aplicação (Backend)**  
-- **Comunicação via API REST**
-
-Essa abordagem garante maior escalabilidade, manutenção simplificada e facilidade de evolução do sistema.
+<p align="center">
+  <img src="docs/img/desktop-silo.png" width="760" alt="Detalhe do sensor do silo no computador">
+</p>
 
 ---
 
-## 💡 Diferenciais
+## Funciona sem internet
 
-- Estrutura moderna e organizada  
-- Separação clara de responsabilidades (frontend/backend)  
-- Base sólida para expansão futura  
-- Foco em desempenho e usabilidade  
-- Aplicação prática no setor agro  
+O GreenAgri foi feito para quem trabalha onde o sinal cai.
+
+1. **Abra o app pelo menos uma vez com internet.** Ele guarda as telas e os últimos dados no aparelho.
+2. **Sem sinal, continue usando normalmente.** O selo no topo mostra **Offline** e quantos lançamentos estão esperando.
+3. **Os lançamentos ficam salvos no aparelho** e o saldo na tela já considera o que você lançou (com o aviso *não sincronizado*).
+4. **Quando o sinal volta, tudo é enviado sozinho**, na ordem em que foi feito. Não precisa repetir nada, e nada é lançado em dobro.
+
+Se o servidor recusar algum lançamento (por exemplo, uma saída maior que o saldo real), ele aparece em **Sincronização**, com o motivo. Ali você pode tentar de novo ou descartar.
+
+> Dica: sair da conta apaga os dados guardados no aparelho. Se houver lançamentos na fila, o app avisa antes.
+
+## Instale na tela inicial
+
+O GreenAgri é um app web instalável (PWA), sem precisar de loja de aplicativos:
+
+- **Android (Chrome):** menu ⋮ → *Instalar app* ou *Adicionar à tela inicial*.
+- **iPhone (Safari):** botão Compartilhar → *Adicionar à Tela de Início*.
+- **Computador (Chrome/Edge):** ícone de instalação na barra de endereço.
+
+## Acesso de demonstração
+
+| Perfil | E-mail | Senha | O que pode fazer |
+|---|---|---|---|
+| Administrador | `admin@greenagri.dev` | `greenagri123` | Tudo, inclusive excluir produtos e cadastrar sensores |
+| Operador | `operador@greenagri.dev` | `greenagri123` | Lançamentos, colheitas e frota |
+
+Também é possível criar uma conta nova pela tela de login (perfil Operador).
+
+A demonstração vem com uma fazenda fictícia: 11 produtos, 13 movimentações, 5 talhões, 6 máquinas e 6 sensores com 3 dias de histórico. Um dos silos tem uma divergência proposital para mostrar o alerta.
 
 ---
 
-## 📦 Como Executar o Projeto
+## Como executar
 
-### 🔧 Backend (Java)
+Precisa de **Java 21+** e **Node 18+**.
 
 ```bash
-# Clone o repositório
-git clone https://github.com/victorgeroto/GreenAgri.git
-
-# Acesse a pasta do backend
+# 1. API (http://localhost:8080)
 cd backend
+./mvnw spring-boot:run        # no Windows: mvnw.cmd spring-boot:run
 
-# Compile e execute o projeto
-# (dependendo da configuração: Maven ou Gradle)
+# 2. App (http://localhost:5173), em outro terminal
+cd frontend
+npm install
+npm run dev
 
+# 3. Opcional: sensores simulados enviando dados ao vivo
+node firmware/simulador/simulador.mjs
 ```
-### 💻 Frontend (JavaScript, HTML e CSS)
+
+Ou tudo com Docker (PostgreSQL + API + app em http://localhost:8081):
 
 ```bash
+docker compose up --build
+```
 
-# Opção 1: abrir direto
-# Acesse a pasta do frontend
-cd frontend
-start index.html   # Windows
+## Para desenvolvedores
 
-# Opção 2: usar extensão Live Server (recomendado no VS Code)
+| Documento | Conteúdo |
+|---|---|
+| [docs/DESENVOLVIMENTO.md](docs/DESENVOLVIMENTO.md) | Estrutura, regras de negócio, endpoints, testes e como funciona o modo offline |
+| [docs/SISTEMA-EMBARCADO.md](docs/SISTEMA-EMBARCADO.md) | Firmware ESP32, protocolo de telemetria, hardware, consumo e roadmap |
+| [firmware/README.md](firmware/README.md) | Como gravar o firmware e usar o simulador |
+| Swagger | http://localhost:8080/swagger-ui.html com a API rodando |
+
+**Tecnologias:** Java 21 · Spring Boot 3.5 · Spring Security (JWT) · JPA · Flyway · PostgreSQL/H2 · React 18 · TypeScript · Vite · Tailwind CSS · TanStack Query · IndexedDB (Dexie) · Workbox (PWA) · Recharts · ESP32 (C++/PlatformIO) · Docker · GitHub Actions
+
+<p align="center">
+  <img src="docs/img/desktop-painel.png" width="760" alt="Painel no computador">
+</p>
