@@ -2,7 +2,9 @@
   <img src="docs/img/logo.png" width="340" alt="GreenAgri">
 </h1>
 
-**Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e receba alertas dos sensores instalados no campo, tudo num só app.
+**Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e a equipe e receba alertas dos sensores instalados no campo, tudo num só app.
+
+<p align="center"><strong>Versão 1.0.0</strong> · <a href="CHANGELOG.md">Novidades desta versão</a></p>
 
 <p align="center">
   <img src="docs/img/mobile-painel.png" width="230" alt="Visão geral no celular, com fotos do campo">
@@ -148,6 +150,7 @@ docker compose up --build
 | [docs/DESENVOLVIMENTO.md](docs/DESENVOLVIMENTO.md) | Estrutura, regras de negócio, endpoints, testes e como funciona o modo offline |
 | [docs/SISTEMA-EMBARCADO.md](docs/SISTEMA-EMBARCADO.md) | Firmware ESP32, rastreador com geofence de talhões, protocolo de telemetria, hardware, consumo e roadmap |
 | [firmware/README.md](firmware/README.md) | Como gravar o firmware e usar o simulador |
+| [CHANGELOG.md](CHANGELOG.md) | Histórico de versões |
 | Swagger | http://localhost:8080/swagger-ui.html com a API rodando |
 
 **Tecnologias:** Java 21 · Spring Boot 3.5 · Spring Security (JWT) · JPA · Flyway · PostgreSQL/H2 · React 18 · TypeScript · Vite · Tailwind CSS · TanStack Query · IndexedDB (Dexie) · Workbox (PWA) · Recharts · Leaflet + OpenStreetMap · ESP32 + GNSS (C++/PlatformIO) · Docker · GitHub Actions
