@@ -2,6 +2,7 @@ import { clsx } from 'clsx'
 import { AlertCircle, Cloud, CloudOff, LayoutDashboard, LogOut, Package, Radio, RefreshCw, Tractor, Wheat, type LucideIcon } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
+import { Logo } from '@/components/Logo'
 import { useSync } from '@/offline/SyncContext'
 
 export const FAZENDA = { nome: 'Fazenda Santa Helena', local: 'Cascavel · PR' }
@@ -82,9 +83,8 @@ export function Layout() {
     <div className="min-h-screen bg-canvas lg:flex">
       {/* Menu lateral (desktop) */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-brand-950 text-white lg:flex">
-        <Link to="/" className="flex h-14 items-center gap-2.5 border-b border-white/10 px-4">
-          <img src="/pwa-64x64.png" alt="" className="h-7 w-7 rounded-md" />
-          <span className="text-[15px] font-semibold tracking-tight">GreenAgri</span>
+        <Link to="/" className="flex h-14 items-center border-b border-white/10 px-4" aria-label="GreenAgri, visão geral">
+          <Logo tamanho={28} comNome claro />
         </Link>
 
         <div className="mx-3 mt-3 rounded-md bg-white/[0.04] px-3 py-2 ring-1 ring-inset ring-white/10">
@@ -137,12 +137,8 @@ export function Layout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-[1001] border-b border-stone-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 lg:px-8">
-            <Link to="/" className="flex items-center gap-2 lg:hidden">
-              <img src="/pwa-64x64.png" alt="" className="h-7 w-7 rounded-md" />
-              <span className="leading-tight">
-                <span className="block text-sm font-semibold tracking-tight">GreenAgri</span>
-                <span className="block text-[11px] text-stone-500">{FAZENDA.nome}</span>
-              </span>
+            <Link to="/" className="lg:hidden" aria-label="GreenAgri, visão geral">
+              <Logo tamanho={28} comNome subtitulo={FAZENDA.nome} />
             </Link>
             <nav aria-label="Você está em" className="hidden items-center gap-1.5 text-sm lg:flex">
               <span className="text-stone-500">{FAZENDA.nome}</span>
