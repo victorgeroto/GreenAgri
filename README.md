@@ -57,6 +57,18 @@
 ### Frota
 - Tratores, colheitadeiras, pulverizadores, caminhões e utilitários num só lugar.
 - Atualize o horímetro (ou o odômetro) e a data da próxima revisão. O app destaca as revisões que vencem em até 7 dias.
+- Cada máquina mostra **quem está operando** e tem o atalho **Alocar operador** (ou *Alocar mecânico*, se estiver na oficina).
+
+### Equipe de campo
+- Veja de relance quem está **disponível**, **em atividade** ou **ausente** (férias, folga, atestado), com turno, CNH e as máquinas que cada pessoa pode operar.
+- **Aloque um operador** numa atividade (colheita, plantio, pulverização, adubação, transporte, manutenção), escolhendo a **máquina** e/ou o **talhão**. A atividade é sugerida pelo tipo da máquina.
+- O app impede erros comuns: a mesma pessoa em duas atividades, duas pessoas na mesma máquina, alguém sem habilitação para aquela máquina, alocar quem está de férias ou usar uma máquina que está na oficina.
+- Ao alocar, a máquina passa para *em operação*. Ao **encerrar** a atividade, ela volta a ficar *disponível*.
+- Funciona offline como o resto do app: a alocação aparece na hora com o selo *Na fila* e é enviada quando o sinal volta.
+
+<p align="center">
+  <img src="docs/img/desktop-equipe.png" width="760" alt="Equipe de campo com operadores disponíveis, em atividade e ausentes">
+</p>
 
 ### Campo conectado (IoT)
 - Veja em tempo real os sensores da fazenda: **estação meteorológica**, **umidade do solo** nos talhões, **nível e temperatura dos silos** e o **rastreador da colheitadeira** (posição, velocidade e trajeto).

@@ -66,6 +66,7 @@ Organizado **por domínio** (cada pacote tem entidade, repositório, serviço, D
 | `talhao` | Talhões georreferenciados (GeoJSON), área e centróide calculados, ponto-no-polígono |
 | `colheita` | Lavouras por talhão e safra, ciclo de status com histórico de eventos; concluir lança a produção no estoque |
 | `frota` | Máquinas e veículos, horímetro e revisões |
+| `equipe` | Operadores, habilitações por tipo de máquina, ausências e alocações em atividades |
 | `iot` | Telemetria, regras de alerta, painel e reconciliação silo × estoque |
 | `dashboard` | Indicadores consolidados |
 | `seed` | Carga de dados de demonstração a partir de `resources/seed/*.json` |
@@ -82,6 +83,7 @@ Organizado **por domínio** (cada pacote tem entidade, repositório, serviço, D
 - **Um talhão, uma lavoura ativa**: plantar soja num talhão com milho em desenvolvimento é recusado (422). A rotação na mesma safra (soja → milho safrinha) é permitida depois da conclusão.
 - **Safra**: calculada pela data de plantio no padrão jul–jun (ago/2025 → 2025/26), podendo ser informada manualmente.
 - **Geofence**: colheitadeira com rastreador operando dentro de um talhão com lavoura em desenvolvimento muda o status para *em colheita* (ver [SISTEMA-EMBARCADO.md](SISTEMA-EMBARCADO.md)).
+- **Alocação da equipe**: um operador por vez em cada atividade e uma atividade por máquina; o operador precisa da habilitação do tipo da máquina (quem opera trator opera implemento), exceto em manutenção; ausentes e máquinas inativas são recusados, e máquina em manutenção só recebe manutenção. A alocação põe a máquina *em operação* (ou *em manutenção*) e o encerramento a libera. Operador e máquina são bloqueados (`PESSIMISTIC_WRITE`, sempre nessa ordem) e o `idCliente` torna o reenvio da fila idempotente.
 - **Unidade imutável com saldo**: trocar sacas por kg num produto com estoque é recusado.
 
 ### Perfis
@@ -110,6 +112,10 @@ O schema é versionado pelo **Flyway** (`db/migration`), e o Hibernate não alte
 | GET/POST | `/api/talhoes` | Talhões com polígono GeoJSON / cadastra (área calculada) |
 | PUT/DELETE | `/api/talhoes/{id}` | Edita / exclui (ADMIN) |
 | GET/POST/PUT/DELETE | `/api/veiculos[/{id}]` | Frota |
+| GET | `/api/equipe/operadores` | Operadores com situação, habilitações e atividade atual |
+| GET | `/api/equipe/operadores/{id}/alocacoes` | Últimas 30 atividades do operador |
+| GET/POST | `/api/equipe/alocacoes` | Atividades em andamento / aloca (`operadorId`, `atividade`, `veiculoId` e/ou `talhaoId`) |
+| POST | `/api/equipe/alocacoes/{id}/encerrar` | Encerra e libera a máquina |
 | POST | `/api/iot/telemetria` | Ingestão do firmware (`X-Device-Key`) |
 | GET/POST | `/api/iot/dispositivos` | Painel / provisiona (ADMIN, devolve a chave) |
 | GET | `/api/iot/dispositivos/{id}/leituras?horas=24` | Série temporal |
