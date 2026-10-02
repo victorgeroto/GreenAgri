@@ -210,6 +210,9 @@ export interface ResumoDashboard {
   dispositivos: number
   alertasIotAbertos: number
   silos: Dispositivo[]
+  operadoresDisponiveis: number
+  operadoresEmAtividade: number
+  operadores: number
 }
 
 /** Polígono GeoJSON; coordenadas em [longitude, latitude]. */
@@ -244,4 +247,54 @@ export interface EventoColheita {
   latitude?: number
   longitude?: number
   ocorridoEm: string
+}
+
+export type Funcao = 'OPERADOR_MAQUINAS' | 'TRATORISTA' | 'MOTORISTA' | 'MECANICO' | 'TECNICO_AGRICOLA' | 'AUXILIAR_CAMPO'
+export type Turno = 'MANHA' | 'TARDE' | 'INTEGRAL' | 'NOITE'
+export type TipoAtividade = 'COLHEITA' | 'PLANTIO' | 'PULVERIZACAO' | 'ADUBACAO' | 'TRANSPORTE' | 'MANUTENCAO' | 'OUTRA'
+export type SituacaoOperador = 'DISPONIVEL' | 'EM_ATIVIDADE' | 'AUSENTE'
+
+export interface Alocacao {
+  id: number
+  operadorId: number
+  operadorNome: string
+  atividade: TipoAtividade
+  veiculoId?: number
+  veiculoIdentificacao?: string
+  veiculoModelo?: string
+  veiculoTipo?: TipoVeiculo
+  talhaoId?: number
+  talhaoCodigo?: string
+  descricao?: string
+  inicio: string
+  previsaoFim?: string
+  encerradaEm?: string
+  responsavel?: string
+  idCliente?: string
+  /** Somente no cliente: alocação ainda na fila offline. */
+  pendente?: boolean
+}
+
+export interface AlocacaoInput {
+  operadorId: number
+  atividade: TipoAtividade
+  veiculoId?: number
+  talhaoId?: number
+  descricao?: string
+  previsaoFim?: string
+  idCliente: string
+}
+
+export interface Operador {
+  id: number
+  matricula: string
+  nome: string
+  funcao: Funcao
+  turno: Turno
+  cnhCategoria?: string
+  habilitacoes: TipoVeiculo[]
+  situacao: SituacaoOperador
+  ausenteAte?: string
+  motivoAusencia?: string
+  alocacaoAtual?: Alocacao
 }

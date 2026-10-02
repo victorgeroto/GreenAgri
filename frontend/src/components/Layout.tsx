@@ -1,5 +1,5 @@
 import { clsx } from 'clsx'
-import { AlertCircle, Cloud, CloudOff, LayoutDashboard, LogOut, Package, Radio, RefreshCw, Tractor, Wheat, type LucideIcon } from 'lucide-react'
+import { AlertCircle, Cloud, CloudOff, LayoutDashboard, LogOut, Package, Radio, RefreshCw, Tractor, Users, Wheat, type LucideIcon } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
 import { Logo } from '@/components/Logo'
@@ -23,6 +23,7 @@ const SECOES: { titulo: string; itens: ItemNav[] }[] = [
       { to: '/estoque', label: 'Estoque', curto: 'Estoque', icon: Package },
       { to: '/colheitas', label: 'Lavouras e colheitas', curto: 'Lavouras', icon: Wheat },
       { to: '/frota', label: 'Frota', curto: 'Frota', icon: Tractor },
+      { to: '/equipe', label: 'Equipe de campo', curto: 'Equipe', icon: Users },
     ],
   },
   {
@@ -169,7 +170,7 @@ export function Layout() {
 
       {/* Barra inferior (mobile) */}
       <nav className="fixed inset-x-0 bottom-0 z-[1001] border-t border-stone-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {NAV.map(({ to, curto, icon: Icon, end }) => (
             <NavLink
               key={to}
