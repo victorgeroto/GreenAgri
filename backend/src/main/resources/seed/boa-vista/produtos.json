@@ -1,0 +1,8 @@
+[
+  { "sku": "GR-SOJA-01", "nome": "Soja em grão (safra 24/25)", "categoria": "GRAOS", "unidade": "SACA", "estoqueMinimo": 1000, "saldoInicial": 8000, "localizacao": "Armazém graneleiro", "descricao": "Soja comercial, umidade 13%", "imagem": "/img/produtos/soja.jpg" },
+  { "sku": "GR-MILHO-01", "nome": "Milho em grão (safrinha)", "categoria": "GRAOS", "unidade": "SACA", "estoqueMinimo": 1500, "saldoInicial": 10300, "localizacao": "Armazém graneleiro", "descricao": "Milho safrinha 2025", "imagem": "/img/produtos/milho.jpg" },
+  { "sku": "SE-FEIJAO-01", "nome": "Semente de feijão carioca", "categoria": "SEMENTES", "unidade": "SACA", "estoqueMinimo": 30, "saldoInicial": 42, "localizacao": "Depósito de sementes", "descricao": "Sacas de 20 kg, tratadas" },
+  { "sku": "FE-KCL-01", "nome": "Cloreto de potássio (KCl)", "categoria": "FERTILIZANTES", "unidade": "TONELADA", "estoqueMinimo": 15, "saldoInicial": 22, "localizacao": "Barracão de insumos", "descricao": "60% K2O, adubação de base" },
+  { "sku": "DF-FUNG-02", "nome": "Fungicida carbendazim", "categoria": "DEFENSIVOS", "unidade": "LITRO", "estoqueMinimo": 60, "saldoInicial": 90, "localizacao": "Depósito de defensivos", "descricao": "Uso conforme receituário agronômico" },
+  { "sku": "CB-DIESEL-01", "nome": "Óleo diesel S10", "categoria": "COMBUSTIVEL", "unidade": "LITRO", "estoqueMinimo": 4000, "saldoInicial": 7000, "localizacao": "Tanque aéreo 20 mil L", "descricao": "Abastecimento da frota" }
+]

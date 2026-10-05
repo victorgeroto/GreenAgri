@@ -17,6 +17,8 @@ export interface ItemFila {
   corpo?: unknown
   /** Texto exibido ao usuário na tela de sincronização. */
   descricao: string
+  /** Fazenda em que o lançamento foi feito; é usada no reenvio mesmo que o usuário troque de fazenda. */
+  fazendaId?: number
   criadoEm: number
   status: StatusFila
   erro?: string

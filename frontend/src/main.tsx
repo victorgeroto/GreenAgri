@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { registerSW } from 'virtual:pwa-register'
 import { App } from './App'
 import { AuthProvider } from './auth/AuthContext'
+import { FazendaProvider } from './fazenda/FazendaContext'
 import { ToastProvider } from './components/Toast'
 import { ApiError } from './lib/api'
 import { SyncProvider } from './offline/SyncContext'
@@ -30,11 +31,13 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <SyncProvider>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
-          </SyncProvider>
+          <FazendaProvider>
+            <SyncProvider>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </SyncProvider>
+          </FazendaProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

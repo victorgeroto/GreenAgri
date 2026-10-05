@@ -3,9 +3,12 @@ import { AlertCircle, Cloud, CloudOff, LayoutDashboard, LogOut, Package, Radio, 
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
 import { Logo } from '@/components/Logo'
+import { Carregando } from '@/components/ui'
+import { useFazenda } from '@/fazenda/FazendaContext'
+import { FazendaForm } from '@/fazenda/FazendaForm'
+import { SeletorFazendaLateral, SeletorFazendaTopo } from '@/fazenda/SeletorFazenda'
 import { useSync } from '@/offline/SyncContext'
 
-export const FAZENDA = { nome: 'Fazenda Santa Helena', local: 'Cascavel · PR' }
 
 interface ItemNav {
   to: string
@@ -65,11 +68,28 @@ function StatusSync({ escuro }: { escuro?: boolean }) {
   )
 }
 
+/** Primeiro acesso de uma conta nova: ainda não há fazenda para trabalhar. */
+function PrimeiraFazenda() {
+  return (
+    <div className="mx-auto max-w-md py-6">
+      <Logo tamanho={44} className="mb-5" />
+      <h1 className="text-xl font-semibold tracking-tight text-stone-900">Cadastre sua primeira fazenda</h1>
+      <p className="mb-6 mt-1 text-sm text-stone-500">
+        Estoque, talhões, frota, equipe e sensores ficam separados por fazenda. Depois você pode adicionar outras e alternar entre elas pelo menu.
+      </p>
+      <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-card">
+        <FazendaForm />
+      </div>
+    </div>
+  )
+}
+
 export function Layout() {
   const { usuario, sair, sessaoExpirada } = useAuth()
   const { pendentes } = useSync()
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const fazenda = useFazenda()
   const atual = [...NAV].reverse().find((n) => (n.end ? pathname === n.to : pathname.startsWith(n.to)))
 
   async function confirmarSaida() {
@@ -83,15 +103,12 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-canvas lg:flex">
       {/* Menu lateral (desktop) */}
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-brand-950 text-white lg:flex">
+      <aside className="sticky top-0 z-[1002] hidden h-screen w-60 shrink-0 flex-col bg-brand-950 text-white lg:flex">
         <Link to="/" className="flex h-14 items-center border-b border-white/10 px-4" aria-label="GreenAgri, visão geral">
           <Logo tamanho={28} comNome claro />
         </Link>
 
-        <div className="mx-3 mt-3 rounded-md bg-white/[0.04] px-3 py-2 ring-1 ring-inset ring-white/10">
-          <p className="truncate text-[13px] font-medium">{FAZENDA.nome}</p>
-          <p className="text-xs text-white/50">{FAZENDA.local}</p>
-        </div>
+        <SeletorFazendaLateral />
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           {SECOES.map((s) => (
@@ -138,12 +155,16 @@ export function Layout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-[1001] border-b border-stone-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 lg:px-8">
-            <Link to="/" className="lg:hidden" aria-label="GreenAgri, visão geral">
-              <Logo tamanho={28} comNome subtitulo={FAZENDA.nome} />
-            </Link>
+            <div className="min-w-0 lg:hidden">
+              <SeletorFazendaTopo />
+            </div>
             <nav aria-label="Você está em" className="hidden items-center gap-1.5 text-sm lg:flex">
-              <span className="text-stone-500">{FAZENDA.nome}</span>
-              <span className="text-stone-300">/</span>
+              {fazenda.atual && (
+                <>
+                  <span className="text-stone-500">{fazenda.atual.nome}</span>
+                  <span className="text-stone-300">/</span>
+                </>
+              )}
               <span className="font-medium text-stone-800">{atual?.label ?? 'Sincronização'}</span>
             </nav>
             <div className="flex items-center gap-2">
@@ -164,7 +185,13 @@ export function Layout() {
         </header>
 
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-28 pt-5 lg:px-8 lg:pb-10 lg:pt-6">
-          <Outlet />
+          {fazenda.carregando ? (
+            <Carregando />
+          ) : fazenda.fazendas.length === 0 ? (
+            <PrimeiraFazenda />
+          ) : (
+            <Outlet />
+          )}
         </main>
       </div>
 

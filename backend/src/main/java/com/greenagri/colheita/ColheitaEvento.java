@@ -2,6 +2,9 @@ package com.greenagri.colheita;
 
 import java.time.Instant;
 
+import org.hibernate.annotations.TenantId;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,6 +37,11 @@ public class ColheitaEvento {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	/** Fazenda dona do registro: preenchida na gravação e aplicada como filtro em toda consulta. */
+	@TenantId
+	@Column(name = "fazenda_id", nullable = false, updatable = false)
+	private Long fazendaId;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "colheita_id")

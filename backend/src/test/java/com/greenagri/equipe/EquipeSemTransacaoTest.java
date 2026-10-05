@@ -1,6 +1,5 @@
 package com.greenagri.equipe;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -15,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.greenagri.Acesso;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -35,7 +35,7 @@ class EquipeSemTransacaoTest {
 
 	@Test
 	void alocarEEncerrarRespondemComOsDadosDoOperadorEDaMaquina() throws Exception {
-		var usuario = jwt().jwt(j -> j.claim("nome", "Encarregado").claim("perfil", "OPERADOR"));
+		var usuario = Acesso.operador();
 		long juliana = id("/api/equipe/operadores", "nome", "Juliana Martins");
 		long hilux = id("/api/veiculos", "identificacao", "QPA8C93");
 
@@ -55,7 +55,7 @@ class EquipeSemTransacaoTest {
 	}
 
 	private long id(String caminho, String campo, String valor) throws Exception {
-		var usuario = jwt().jwt(j -> j.claim("nome", "Encarregado").claim("perfil", "OPERADOR"));
+		var usuario = Acesso.operador();
 		for (JsonNode n : mapper.readTree(mvc.perform(get(caminho).with(usuario)).andReturn().getResponse().getContentAsString())) {
 			if (valor.equals(n.get(campo).asText())) {
 				return n.get("id").asLong();

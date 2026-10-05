@@ -1,12 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useFazenda } from '@/fazenda/FazendaContext'
 import { db, type ItemFila } from './db'
 import { processarFila, type ResultadoSincronizacao } from './sync'
 
 interface SyncState {
   online: boolean
+  /** Fila da fazenda selecionada (usada para projetar saldos e status nas telas). */
   fila: ItemFila[]
+  /** Fila de todas as fazendas, na ordem de envio. */
+  filaTotal: ItemFila[]
   pendentes: number
   falhas: number
   sincronizando: boolean
@@ -23,10 +27,12 @@ export function SyncProvider({ children }: { children: ReactNode }) {
   const [online, setOnline] = useState(navigator.onLine)
   const [sincronizando, setSincronizando] = useState(false)
   const [ultimaSincronizacao, setUltima] = useState<number>()
-  const fila = useLiveQuery(() => db.fila.orderBy('id').toArray(), [], [])
+  const filaTotal = useLiveQuery(() => db.fila.orderBy('id').toArray(), [], [])
+  const { atual } = useFazenda()
+  const fila = useMemo(() => filaTotal.filter((i) => (i.fazendaId ?? atual?.id) === atual?.id), [filaTotal, atual?.id])
 
-  const pendentes = fila.filter((i) => i.status === 'pendente').length
-  const falhas = fila.length - pendentes
+  const pendentes = filaTotal.filter((i) => i.status === 'pendente').length
+  const falhas = filaTotal.length - pendentes
 
   const sincronizar = useCallback(async () => {
     setSincronizando(true)
@@ -65,8 +71,8 @@ export function SyncProvider({ children }: { children: ReactNode }) {
   }, [online, temPendentes, sincronizar])
 
   const value = useMemo(
-    () => ({ online, fila, pendentes, falhas, sincronizando, ultimaSincronizacao, sincronizar }),
-    [online, fila, pendentes, falhas, sincronizando, ultimaSincronizacao, sincronizar],
+    () => ({ online, fila, filaTotal, pendentes, falhas, sincronizando, ultimaSincronizacao, sincronizar }),
+    [online, fila, filaTotal, pendentes, falhas, sincronizando, ultimaSincronizacao, sincronizar],
   )
   return <SyncContext.Provider value={value}>{children}</SyncContext.Provider>
 }

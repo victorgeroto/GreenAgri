@@ -4,13 +4,13 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { CircleMarker, LayersControl, LayerGroup, MapContainer, Marker, Polygon, Polyline, Popup, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui'
+import { centroDaFazenda, useFazenda } from '@/fazenda/FazendaContext'
 import { fmtNumero, fmtRelativo, STATUS_COLHEITA } from '@/lib/format'
 import { areaHa, paraLatLngs, type LatLng } from '@/lib/geo'
 import type { Colheita, Dispositivo, Leitura, Talhao } from '@/lib/types'
 import { useDados } from '@/offline/hooks'
 import { COR_SEM_LAVOURA, COR_STATUS } from './cores'
 
-const SEDE: LatLng = [-24.88, -53.56]
 
 interface Props {
   talhoes: Talhao[]
@@ -77,6 +77,7 @@ function Maquina({ d }: { d: Dispositivo }) {
 
 export function MapaFazenda({ talhoes, porTalhao, dispositivos, selecionado, onSelecionar, onDesenhoConcluido }: Props) {
   const [desenho, setDesenho] = useState<LatLng[] | null>(null)
+  const { centro, zoom } = centroDaFazenda(useFazenda().atual)
   const [legendaAberta] = useState(() => window.matchMedia('(min-width: 1024px)').matches)
   const desenhados = useMemo(() => talhoes.filter((t) => t.geometria), [talhoes])
   const sensores = dispositivos.filter((d) => d.tipo !== 'RASTREADOR_MAQUINA' && d.latitude != null && d.longitude != null)
@@ -84,7 +85,7 @@ export function MapaFazenda({ talhoes, porTalhao, dispositivos, selecionado, onS
 
   return (
     <div className="relative isolate h-[62vh] min-h-[420px] overflow-hidden rounded-lg border border-stone-200 lg:h-[calc(100vh-15rem)]">
-      <MapContainer center={SEDE} zoom={14} className="h-full w-full" scrollWheelZoom>
+      <MapContainer center={centro} zoom={zoom} className="h-full w-full" scrollWheelZoom>
         <LayersControl position="topright">
           <LayersControl.BaseLayer checked name="Mapa (OpenStreetMap)">
             <TileLayer

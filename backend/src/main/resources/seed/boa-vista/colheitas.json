@@ -1,0 +1,8 @@
+[
+  { "talhao": "BV-02", "cultura": "Soja", "diasPlantio": -390, "diasPrevisao": -270, "producaoEstimadaKg": 470000, "status": "CONCLUIDA", "diasColheita": -268, "producaoRealKg": 480000, "produtoSku": "GR-SOJA-01", "observacoes": "58 sc/ha" },
+  { "talhao": "BV-02", "cultura": "Milho safrinha", "diasPlantio": -262, "diasPrevisao": -130, "producaoEstimadaKg": 660000, "status": "CONCLUIDA", "diasColheita": -128, "producaoRealKg": 690000, "produtoSku": "GR-MILHO-01", "observacoes": "Plantado logo após a soja" },
+  { "talhao": "BV-03", "cultura": "Soja", "diasPlantio": -385, "diasPrevisao": -265, "producaoEstimadaKg": 540000, "status": "CONCLUIDA", "diasColheita": -262, "producaoRealKg": 522000, "produtoSku": "GR-SOJA-01", "observacoes": "Veranico em janeiro" },
+  { "talhao": "P-01", "cultura": "Feijão irrigado", "diasPlantio": -55, "diasPrevisao": 35, "producaoEstimadaKg": 330000, "status": "EM_DESENVOLVIMENTO", "observacoes": "Irrigação por pivô central, lâmina de 6 mm/dia" },
+  { "talhao": "BV-02", "cultura": "Soja", "diasPlantio": 12, "diasPrevisao": 130, "producaoEstimadaKg": 490000, "status": "PLANEJADA", "produtoSku": "GR-SOJA-01", "observacoes": "Plantio após as primeiras chuvas" },
+  { "talhao": "BV-03", "cultura": "Soja", "diasPlantio": 18, "diasPrevisao": 135, "producaoEstimadaKg": 560000, "status": "PLANEJADA", "produtoSku": "GR-SOJA-01" }
+]

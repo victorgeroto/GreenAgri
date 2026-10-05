@@ -4,6 +4,7 @@ import { CircleMarker, MapContainer, Polygon, Polyline, TileLayer, Tooltip, useM
 import { fmtDataHora } from '@/lib/format'
 import { paraLatLngs, type LatLng } from '@/lib/geo'
 import type { Leitura, Talhao } from '@/lib/types'
+import { centroDaFazenda, useFazenda } from '@/fazenda/FazendaContext'
 
 /** Enquadra o trajeto quando os primeiros pontos chegam; depois deixa o usuário navegar. */
 function Enquadrar({ pontos }: { pontos: LatLng[] }) {
@@ -20,6 +21,7 @@ function Enquadrar({ pontos }: { pontos: LatLng[] }) {
 
 /** Trajeto da máquina sobre os talhões; trechos com o implemento operando ficam em linha cheia. */
 export function TrajetoMapa({ leituras, talhoes }: { leituras: Leitura[]; talhoes: Talhao[] }) {
+  const sede = centroDaFazenda(useFazenda().atual).centro
   const pontos = leituras.filter((l) => l.latitude != null && l.longitude != null)
   const trajeto = pontos.map((l) => [l.latitude!, l.longitude!] as LatLng)
   const operando = pontos.filter((l) => l.operando).map((l) => [l.latitude!, l.longitude!] as LatLng)
@@ -27,7 +29,7 @@ export function TrajetoMapa({ leituras, talhoes }: { leituras: Leitura[]; talhoe
 
   return (
     <figure className="relative isolate h-80 overflow-hidden rounded-lg border border-stone-200 lg:col-span-2" aria-label="Trajeto da máquina no mapa">
-      <MapContainer center={trajeto[0] ?? [-24.88, -53.56]} zoom={15} className="h-full w-full">
+      <MapContainer center={trajeto[0] ?? sede} zoom={15} className="h-full w-full">
         <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" maxZoom={19} />
         {talhoes.filter((t) => t.geometria).map((t) => (
           <Polygon key={t.id} positions={paraLatLngs(t.geometria!)} pathOptions={{ color: '#78716c', weight: 1, fillOpacity: 0.05 }}>
