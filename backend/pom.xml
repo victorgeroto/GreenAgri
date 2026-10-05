@@ -12,7 +12,7 @@
 
 	<groupId>com.greenagri</groupId>
 	<artifactId>greenagri-api</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<name>GreenAgri API</name>
 	<description>API REST de gestão agrícola: estoque, colheitas, frota e telemetria IoT</description>
 
