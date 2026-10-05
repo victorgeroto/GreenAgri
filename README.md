@@ -4,7 +4,7 @@
 
 **Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e a equipe, cuide de mais de uma fazenda e receba alertas dos sensores instalados no campo, tudo num só app.
 
-<p align="center"><strong>Versão 1.0.0</strong> · <a href="CHANGELOG.md">Novidades desta versão</a></p>
+<p align="center"><strong>Versão 1.1.0</strong> · <a href="CHANGELOG.md">Novidades desta versão</a></p>
 
 <p align="center">
   <img src="docs/img/mobile-painel.png" width="230" alt="Visão geral no celular, com fotos do campo">
