@@ -1,6 +1,7 @@
 import { CalendarOff, CloudOff, Search, Square, Tractor, UserCheck, UserPlus, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Abas, Badge, Button, Card, Carregando, Erro, Indicador, Indicadores, Input, PageHeader, Segmentado, Vazio } from '@/components/ui'
+import { useConfirmar } from '@/components/Confirmar'
 import { useToast } from '@/components/Toast'
 import { ATIVIDADES, fmtData, fmtHora, fmtRelativo, FUNCOES, SITUACOES, TIPOS_VEICULO, TURNOS } from '@/lib/format'
 import type { Alocacao, Operador, SituacaoOperador, Talhao, Veiculo } from '@/lib/types'
@@ -17,6 +18,7 @@ const tomSituacao = { DISPONIVEL: 'verde', EM_ATIVIDADE: 'azul', AUSENTE: 'neutr
 function BotaoEncerrar({ a, nome, pendente }: { a: Alocacao; nome: string; pendente?: boolean }) {
   const encerrar = useEncerrar()
   const toast = useToast()
+  const confirmar = useConfirmar()
   return (
     <Button
       variant="secondary"
@@ -26,7 +28,8 @@ function BotaoEncerrar({ a, nome, pendente }: { a: Alocacao; nome: string; pende
       title={a.pendente ? 'Aguardando sincronizar a alocação' : undefined}
       carregando={encerrar.isPending}
       onClick={async () => {
-        if (!confirm(`Encerrar ${ATIVIDADES[a.atividade].toLowerCase()} de ${nome}?`)) return
+        const ok = await confirmar({ titulo: `Encerrar ${ATIVIDADES[a.atividade].toLowerCase()}?`, mensagem: `${nome} fica disponível${a.veiculoIdentificacao ? ` e ${a.veiculoIdentificacao} é liberada` : ''}.`, confirmar: 'Encerrar' })
+        if (!ok) return
         try {
           const r = await encerrar.mutateAsync({ alocacao: a, operadorNome: nome })
           toast(r.status === 'enviado' ? 'sucesso' : 'fila', r.status === 'enviado' ? 'Atividade encerrada' : 'Sem conexão: encerramento será sincronizado')

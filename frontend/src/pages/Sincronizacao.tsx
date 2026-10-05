@@ -1,5 +1,6 @@
 import { CheckCircle2, CloudOff, RefreshCw, RotateCcw, Trash2, XCircle } from 'lucide-react'
 import { Badge, Button, Card, PageHeader, Vazio } from '@/components/ui'
+import { useConfirmar } from '@/components/Confirmar'
 import { useToast } from '@/components/Toast'
 import { fmtDataHora, fmtRelativo } from '@/lib/format'
 import { useFazenda } from '@/fazenda/FazendaContext'
@@ -11,6 +12,7 @@ export default function Sincronizacao() {
   const { fazendas } = useFazenda()
   const nomeDa = (id?: number) => fazendas.find((f) => f.id === id)?.nome
   const toast = useToast()
+  const confirmar = useConfirmar()
 
   async function sincronizarAgora() {
     const r = await sincronizar()
@@ -62,7 +64,7 @@ export default function Sincronizacao() {
                       variant="ghost"
                       size="sm"
                       icon={Trash2}
-                      onClick={() => confirm('Descartar este lançamento?') && descartar(item.id!)}
+                      onClick={async () => (await confirmar({ titulo: 'Descartar lançamento?', mensagem: 'Ele não será enviado ao servidor.', confirmar: 'Descartar', perigo: true })) && descartar(item.id!)}
                       aria-label="Descartar"
                     />
                   </div>

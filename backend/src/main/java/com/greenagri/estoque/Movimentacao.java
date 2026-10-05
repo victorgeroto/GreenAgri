@@ -56,6 +56,9 @@ public class Movimentacao {
 	/** UUID gerado pelo cliente; torna o reenvio da fila offline idempotente. */
 	private String idCliente;
 
+	/** Foto do lançamento (data URL JPEG reduzida no app). */
+	private String foto;
+
 	/** Quando aconteceu no campo (pode ser anterior ao registro, se feito offline). */
 	private Instant ocorridoEm;
 

@@ -31,6 +31,12 @@ public class EstoqueService {
 	@Transactional
 	public Movimentacao registrar(Long produtoId, TipoMovimentacao tipo, BigDecimal quantidade, String motivo,
 			String responsavel, String idCliente, Instant ocorridoEm) {
+		return registrar(produtoId, tipo, quantidade, motivo, responsavel, idCliente, ocorridoEm, null);
+	}
+
+	@Transactional
+	public Movimentacao registrar(Long produtoId, TipoMovimentacao tipo, BigDecimal quantidade, String motivo,
+			String responsavel, String idCliente, Instant ocorridoEm, String foto) {
 		if (idCliente != null) {
 			Optional<Movimentacao> existente = movimentacoes.findByIdCliente(idCliente);
 			if (existente.isPresent()) {
@@ -65,6 +71,7 @@ public class EstoqueService {
 		mov.setMotivo(motivo);
 		mov.setResponsavel(responsavel);
 		mov.setIdCliente(idCliente);
+		mov.setFoto(foto == null || foto.isBlank() ? null : foto);
 		// Horário do dispositivo é aceito para lançamentos offline, mas nunca no futuro.
 		mov.setOcorridoEm(ocorridoEm == null || ocorridoEm.isAfter(agora) ? agora : ocorridoEm);
 		mov.setRegistradoEm(agora);

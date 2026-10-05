@@ -44,7 +44,7 @@ public class EstoqueController {
 	public MovimentacaoResponse registrar(@Valid @RequestBody MovimentacaoRequest req,
 			@AuthenticationPrincipal Jwt jwt) {
 		return MovimentacaoResponse.de(service.registrar(req.produtoId(), req.tipo(), req.quantidade(), req.motivo(),
-				jwt.getClaimAsString("nome"), req.idCliente(), req.ocorridoEm()));
+				jwt.getClaimAsString("nome"), req.idCliente(), req.ocorridoEm(), req.foto()));
 	}
 
 	@GetMapping("/alertas")

@@ -2,6 +2,7 @@ import { clsx } from 'clsx'
 import { AlertCircle, Cloud, CloudOff, LayoutDashboard, LogOut, Package, Radio, RefreshCw, Tractor, Users, Wheat, type LucideIcon } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
+import { useConfirmar } from '@/components/Confirmar'
 import { Logo } from '@/components/Logo'
 import { Carregando } from '@/components/ui'
 import { useFazenda } from '@/fazenda/FazendaContext'
@@ -88,13 +89,19 @@ export function Layout() {
   const { usuario, sair, sessaoExpirada } = useAuth()
   const { pendentes } = useSync()
   const navigate = useNavigate()
+  const confirmar = useConfirmar()
   const { pathname } = useLocation()
   const fazenda = useFazenda()
   const atual = [...NAV].reverse().find((n) => (n.end ? pathname === n.to : pathname.startsWith(n.to)))
 
   async function confirmarSaida() {
-    const aviso = pendentes > 0 ? `\n\nAtenção: ${pendentes} lançamento(s) ainda não sincronizado(s) serão perdidos.` : ''
-    if (confirm(`Deseja sair da conta?${aviso}`)) {
+    const ok = await confirmar({
+      titulo: 'Sair da conta?',
+      mensagem: pendentes > 0 ? `${pendentes} lançamento(s) ainda não sincronizado(s) serão perdidos neste aparelho.` : 'Os dados salvos neste aparelho para uso offline serão apagados.',
+      confirmar: 'Sair',
+      perigo: pendentes > 0,
+    })
+    if (ok) {
       await sair()
       navigate('/entrar')
     }

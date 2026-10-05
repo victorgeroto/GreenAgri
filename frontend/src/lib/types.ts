@@ -70,6 +70,7 @@ export interface Movimentacao {
   registradoEm: string
   /** Somente no cliente: lançamento ainda na fila offline. */
   pendente?: boolean
+  foto?: string
 }
 
 export interface MovimentacaoInput {
@@ -79,6 +80,8 @@ export interface MovimentacaoInput {
   motivo?: string
   idCliente: string
   ocorridoEm: string
+  /** data URL JPEG reduzida no aparelho. */
+  foto?: string
 }
 
 export type StatusColheita = 'PLANEJADA' | 'EM_DESENVOLVIMENTO' | 'EM_COLHEITA' | 'CONCLUIDA'

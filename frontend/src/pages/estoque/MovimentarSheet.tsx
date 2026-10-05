@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { CampoFoto } from '@/components/CampoFoto'
 import { Button, Field, Input, Segmentado, Select, Sheet, Textarea } from '@/components/ui'
 import { useToast } from '@/components/Toast'
 import { ApiError } from '@/lib/api'
@@ -27,6 +28,7 @@ export function MovimentarSheet({ aberto, onFechar, produtos, produtoInicial }: 
   const [tipo, setTipo] = useState<TipoMovimentacao>('SAIDA')
   const [quantidade, setQuantidade] = useState('')
   const [motivo, setMotivo] = useState('')
+  const [foto, setFoto] = useState<string>()
   const [quando, setQuando] = useState(agoraLocal)
   const [erro, setErro] = useState<string>()
 
@@ -35,6 +37,7 @@ export function MovimentarSheet({ aberto, onFechar, produtos, produtoInicial }: 
       setProdutoId(produtoInicial?.id)
       setQuantidade('')
       setMotivo('')
+      setFoto(undefined)
       setQuando(agoraLocal())
       setErro(undefined)
     }
@@ -58,6 +61,7 @@ export function MovimentarSheet({ aberto, onFechar, produtos, produtoInicial }: 
         motivo: motivo.trim() || undefined,
         idCliente: crypto.randomUUID(),
         ocorridoEm: new Date(quando).toISOString(),
+        foto,
       })
       toast(r.status === 'enviado' ? 'sucesso' : 'fila', r.status === 'enviado' ? 'Movimentação registrada' : 'Sem conexão: lançamento salvo e será sincronizado')
       onFechar()
@@ -113,6 +117,7 @@ export function MovimentarSheet({ aberto, onFechar, produtos, produtoInicial }: 
         <Field label="Motivo (opcional)">
           {(id) => <Textarea id={id} value={motivo} maxLength={200} onChange={(e) => setMotivo(e.target.value)} placeholder="Ex.: venda, plantio do talhão T-03, compra NF 123" />}
         </Field>
+        <CampoFoto valor={foto} onChange={setFoto} dica="Ex.: carga recebida, nota fiscal ou produto despachado." />
         {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
         <Button type="submit" className="w-full" carregando={movimentar.isPending} disabled={!produto || !quantidade || saldoInsuficiente}>
           Registrar

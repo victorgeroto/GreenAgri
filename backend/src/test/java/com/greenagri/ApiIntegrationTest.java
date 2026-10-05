@@ -260,6 +260,24 @@ class ApiIntegrationTest {
 			.andExpect(jsonPath("$.campos.imagem").value("Imagem inválida"));
 	}
 
+	@Test
+	void movimentacaoGuardaFotoERecusaConteudoInvalido() throws Exception {
+		long id = criarProduto("TST-FOTO", 10);
+		String corpo = """
+				{"produtoId":%d,"tipo":"ENTRADA","quantidade":5,"foto":"%s"}
+				""";
+		mvc.perform(post("/api/estoque/movimentacoes").with(operador()).contentType(MediaType.APPLICATION_JSON)
+			.content(corpo.formatted(id, "data:image/jpeg;base64,/9j/4AAQ")))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.foto").value("data:image/jpeg;base64,/9j/4AAQ"));
+		mvc.perform(get("/api/estoque/movimentacoes").param("produtoId", String.valueOf(id)).with(operador()))
+			.andExpect(jsonPath("$[0].foto").value("data:image/jpeg;base64,/9j/4AAQ"));
+		mvc.perform(post("/api/estoque/movimentacoes").with(operador()).contentType(MediaType.APPLICATION_JSON)
+			.content(corpo.formatted(id, "https://site-externo/x.jpg")))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.campos.foto").value("Foto inválida"));
+	}
+
 	private long criarProduto(String sku, int saldoInicial) throws Exception {
 		String body = """
 				{"sku":"%s","nome":"Produto %s","categoria":"GRAOS","unidade":"SACA",

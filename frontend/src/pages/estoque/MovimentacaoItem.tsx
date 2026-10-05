@@ -1,5 +1,6 @@
 import { clsx } from 'clsx'
 import { ArrowDownLeft, ArrowUpRight, ClipboardCheck, CloudOff } from 'lucide-react'
+import { FotoMiniatura } from '@/components/CampoFoto'
 import { Badge } from '@/components/ui'
 import { fmtDataHora, fmtQtd, TIPOS_MOVIMENTACAO } from '@/lib/format'
 import type { Movimentacao } from '@/lib/types'
@@ -35,6 +36,7 @@ export function MovimentacaoItem({ m, mostrarProduto = true }: { m: Movimentacao
           {m.responsavel && ` · ${m.responsavel}`}
         </p>
       </div>
+      {m.foto && <FotoMiniatura src={m.foto} titulo={`${TIPOS_MOVIMENTACAO[m.tipo]} · ${m.produtoNome}`} />}
       <div className="text-right">
         <p className="text-sm font-semibold tabular-nums text-stone-900">
           {sinal} {fmtQtd(m.quantidade, m.unidade)}

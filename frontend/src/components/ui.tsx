@@ -29,9 +29,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   carregando?: boolean
 }
 
-export function Button({ variant = 'primary', size = 'md', icon: Icon, carregando, className, children, disabled, ...rest }: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button({ variant = 'primary', size = 'md', icon: Icon, carregando, className, children, disabled, ...rest }, ref) {
   return (
     <button
+      ref={ref}
       className={clsx(
         'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md font-medium transition-colors',
         'disabled:cursor-not-allowed disabled:opacity-50',
@@ -49,7 +50,7 @@ export function Button({ variant = 'primary', size = 'md', icon: Icon, carregand
       {children}
     </button>
   )
-}
+})
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
   return <div className={clsx('min-w-0 rounded-lg border border-stone-200 bg-white p-4 shadow-card', className)}>{children}</div>

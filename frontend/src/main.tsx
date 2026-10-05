@@ -6,6 +6,7 @@ import { registerSW } from 'virtual:pwa-register'
 import { App } from './App'
 import { AuthProvider } from './auth/AuthContext'
 import { FazendaProvider } from './fazenda/FazendaContext'
+import { ConfirmarProvider } from './components/Confirmar'
 import { ToastProvider } from './components/Toast'
 import { ApiError } from './lib/api'
 import { SyncProvider } from './offline/SyncContext'
@@ -34,7 +35,9 @@ createRoot(document.getElementById('root')!).render(
           <FazendaProvider>
             <SyncProvider>
               <ToastProvider>
-                <App />
+                <ConfirmarProvider>
+                  <App />
+                </ConfirmarProvider>
               </ToastProvider>
             </SyncProvider>
           </FazendaProvider>

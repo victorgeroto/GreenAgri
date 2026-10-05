@@ -27,6 +27,11 @@ export default {
       fontFamily: {
         sans: ['"Inter Variable"', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
+      keyframes: {
+        aparecer: { from: { opacity: '0' }, to: { opacity: '1' } },
+        subir: { from: { opacity: '0', transform: 'translateY(8px) scale(0.98)' }, to: { opacity: '1', transform: 'none' } },
+        esvaziar: { from: { transform: 'scaleX(1)' }, to: { transform: 'scaleX(0)' } },
+      },
       boxShadow: {
         card: '0 1px 2px 0 rgb(28 25 23 / 0.04)',
         pop: '0 8px 24px -6px rgb(28 25 23 / 0.18), 0 2px 6px -2px rgb(28 25 23 / 0.08)',
