@@ -61,6 +61,7 @@ Organizado **por domínio** (cada pacote tem entidade, repositório, serviço, D
 | Pacote | Responsabilidade |
 |---|---|
 | `auth` | Usuários, login/registro, emissão de JWT (HS256) |
+| `fazenda` | Fazendas, acesso dos usuários, filtro `X-Fazenda-Id` e resolver de tenant do Hibernate |
 | `produto` | Cadastro de produtos; o saldo **não** é editável diretamente |
 | `estoque` | Movimentações (entrada, saída e inventário) e alertas de estoque mínimo |
 | `talhao` | Talhões georreferenciados (GeoJSON), área e centróide calculados, ponto-no-polígono |
@@ -71,6 +72,20 @@ Organizado **por domínio** (cada pacote tem entidade, repositório, serviço, D
 | `dashboard` | Indicadores consolidados |
 | `seed` | Carga de dados de demonstração a partir de `resources/seed/*.json` |
 | `shared` | Exceções de domínio e tratamento global (RFC 7807) |
+
+### Várias fazendas (multi-tenant)
+
+Cada registro pertence a uma fazenda. O isolamento é feito pelo Hibernate, não por filtros espalhados no código:
+
+- As 11 entidades de fazenda (produto, movimentação, talhão, colheita, evento, veículo, dispositivo, leitura, alerta, operador e alocação) têm `@TenantId fazendaId`. O Hibernate preenche o `fazenda_id` ao gravar e o aplica em **toda** consulta, inclusive `findById`. Um repositório não consegue devolver dados de outra fazenda.
+- O `FazendaFilter` lê o header `X-Fazenda-Id` depois da autenticação JWT e confere se o usuário é membro da fazenda (400 sem header, 403 sem acesso). O `FazendaTenantResolver` entrega essa fazenda ao Hibernate quando a sessão abre.
+- Sem fazenda selecionada, o Hibernate opera em **modo raiz** (`isRoot`), sem filtro. Isso é usado no login, na listagem e no cadastro de fazendas, e na carga inicial.
+- **Telemetria:** o dispositivo não tem usuário. A API autentica a chave em modo raiz, descobre a fazenda do dispositivo e processa o lote dentro dela, para leituras, alertas e o geofence da colheitadeira ficarem restritos à mesma fazenda.
+- **Unicidade por fazenda:** SKU, código do talhão, placa e matrícula são únicos por `(fazenda_id, código)`. O código do dispositivo continua único no sistema, porque autentica a telemetria.
+- **Migração:** o V5 move os dados existentes para uma "Fazenda principal", com acesso para todos os usuários. O V6, em Java, troca as restrições únicas antigas (criadas sem nome no V1) localizando-as pelo `information_schema`, o que funciona em H2 e PostgreSQL.
+- **Testes:** classes `@Transactional` usam o `FazendaDoTesteListener`, porque a transação do teste abre antes do filtro HTTP. O `MultiFazendaIntegrationTest` roda sem transação, como em produção.
+
+No frontend, a fazenda selecionada vai no header de toda requisição (`fazendaStore` em `lib/api.ts`), as chaves do React Query e do cache offline incluem a fazenda, e cada item da fila guarda o `fazendaId` de origem para o reenvio.
 
 ### Regras de negócio importantes
 
@@ -97,9 +112,13 @@ O schema é versionado pelo **Flyway** (`db/migration`), e o Hibernate não alte
 
 ### Endpoints
 
+Exceto login, fazendas e telemetria, todas as rotas exigem o header `X-Fazenda-Id`.
+
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/api/auth/login` · `/api/auth/registro` | Autenticação (público) |
+| GET/POST | `/api/fazendas` | Fazendas do usuário / cadastra (quem cadastra ganha acesso) |
+| PUT | `/api/fazendas/{id}` | Edita nome, município, UF e coordenadas da sede |
 | GET/POST | `/api/produtos` | Lista (`?q=`, `?categoria=`) / cria |
 | GET/PUT/DELETE | `/api/produtos/{id}` | Detalhe / edita / exclui (ADMIN) |
 | GET/POST | `/api/estoque/movimentacoes` | Histórico (`?produtoId=`) / lança |

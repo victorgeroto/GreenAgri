@@ -2,7 +2,7 @@
   <img src="docs/img/logo.png" width="340" alt="GreenAgri">
 </h1>
 
-**Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e a equipe e receba alertas dos sensores instalados no campo, tudo num só app.
+**Gestão da fazenda no celular, inclusive sem sinal.** Controle o estoque de grãos e insumos, acompanhe as colheitas por talhão, organize a frota e a equipe, cuide de mais de uma fazenda e receba alertas dos sensores instalados no campo, tudo num só app.
 
 <p align="center"><strong>Versão 1.0.0</strong> · <a href="CHANGELOG.md">Novidades desta versão</a></p>
 
@@ -15,6 +15,17 @@
 ---
 
 ## O que dá para fazer
+
+### Várias fazendas
+- Trabalhe com **mais de uma propriedade** na mesma conta. O nome da fazenda atual fica no topo do menu (no celular, no cabeçalho). Toque nele para **trocar de fazenda** ou **adicionar uma nova**.
+- Cada fazenda tem **estoque, talhões, safras, frota, equipe e sensores próprios**. O que você lança numa não aparece na outra, e os mesmos códigos (como o talhão "T-01" ou o SKU de um produto) podem existir em fazendas diferentes.
+- Ao cadastrar uma fazenda, informe nome, município e estado. Toque em **Usar minha localização** para o mapa já abrir na sede.
+- Cada pessoa só vê as fazendas a que tem acesso. Quem cadastra uma fazenda passa a ter acesso a ela.
+- **Offline:** um lançamento feito sem sinal vai para a fazenda em que foi feito, mesmo que você troque de fazenda antes de o sinal voltar.
+
+<p align="center">
+  <img src="docs/img/desktop-fazendas.png" width="760" alt="Seletor de fazendas no menu lateral">
+</p>
 
 ### Visão geral
 - A tela inicial abre com um **carrossel de fotos do campo** (plantio, lavoura, adubação), com a safra atual, a área em campo e o clima medido pela estação da fazenda por cima das fotos.
@@ -108,12 +119,15 @@ O GreenAgri é um app web instalável (PWA), sem precisar de loja de aplicativos
 
 | Perfil | E-mail | Senha | O que pode fazer |
 |---|---|---|---|
-| Administrador | `admin@greenagri.dev` | `greenagri123` | Tudo, inclusive excluir produtos e cadastrar sensores |
-| Operador | `operador@greenagri.dev` | `greenagri123` | Lançamentos, colheitas e frota |
+| Administrador | `admin@greenagri.dev` | `greenagri123` | Tudo, inclusive excluir produtos e cadastrar sensores. Acessa as **duas fazendas** |
+| Operador | `operador@greenagri.dev` | `greenagri123` | Lançamentos, colheitas, frota e equipe. Acessa só a Santa Helena |
 
-Também é possível criar uma conta nova pela tela de login (perfil Operador).
+Também é possível criar uma conta nova pela tela de login (perfil Operador). No primeiro acesso, o app pede para cadastrar a primeira fazenda.
 
-A demonstração vem com uma fazenda fictícia perto de Cascavel (PR): 11 produtos, 13 movimentações, 5 talhões desenhados no mapa com 3 safras de histórico, 6 máquinas e 7 dispositivos com 3 dias de leituras. Um dos silos tem uma divergência proposital para mostrar o alerta.
+A demonstração vem com **duas fazendas fictícias**:
+
+- **Fazenda Santa Helena** (Cascavel/PR): 11 produtos, 5 talhões com 3 safras de histórico, 6 máquinas, 9 operadores e 7 dispositivos com 3 dias de leituras. Um dos silos tem uma divergência proposital para mostrar o alerta.
+- **Fazenda Boa Vista** (Rio Verde/GO): 6 produtos, um pivô de irrigação com feijão e 2 talhões de soja, 3 máquinas e 3 operadores, sem sensores.
 
 **Para ver a colheita começar sozinha:** abra *Colheitas → Mapa*, rode o simulador (passo 3 abaixo) e aguarde cerca de 1 minuto. A colheitadeira sai do galpão e entra no talhão T-04, que muda de *em desenvolvimento* para *em colheita*.
 
