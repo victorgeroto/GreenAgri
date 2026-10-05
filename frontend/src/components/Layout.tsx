@@ -4,6 +4,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import { useAuth } from '@/auth/AuthContext'
 import { useConfirmar } from '@/components/Confirmar'
 import { Logo } from '@/components/Logo'
+import { CentralNotificacoes } from '@/notificacoes/CentralNotificacoes'
 import { Carregando } from '@/components/ui'
 import { useFazenda } from '@/fazenda/FazendaContext'
 import { FazendaForm } from '@/fazenda/FazendaForm'
@@ -176,6 +177,7 @@ export function Layout() {
             </nav>
             <div className="flex items-center gap-2">
               <StatusSync />
+              {fazenda.atual && <CentralNotificacoes />}
               <button onClick={confirmarSaida} className="rounded-md p-2 text-stone-500 hover:bg-stone-100 lg:hidden" aria-label="Sair">
                 <LogOut className="h-4 w-4" />
               </button>
