@@ -1,7 +1,7 @@
 import { clsx } from 'clsx'
 import { ArrowLeftRight, CloudOff, History, Package, Plus, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { ImagemProduto } from '@/components/ImagemProduto'
 import { Abas, Badge, Barra, Button, Carregando, Erro, Input, PageHeader, Select, Vazio } from '@/components/ui'
 import { CATEGORIAS, fmtQtd } from '@/lib/format'
@@ -147,6 +147,15 @@ export default function Estoque() {
   const [filtro, setFiltro] = useState<Filtro>('TODAS')
   const [movimentando, setMovimentando] = useState<{ produto?: Produto } | null>(null)
   const [novo, setNovo] = useState(false)
+
+  // Atalho do roteiro de primeiros passos: ?novo=1 abre o cadastro.
+  const [params, setParams] = useSearchParams()
+  useEffect(() => {
+    if (params.get('novo') === '1') {
+      setNovo(true)
+      setParams({}, { replace: true })
+    }
+  }, [params, setParams])
 
   const filtrados = useMemo(() => {
     const termo = busca.trim().toLowerCase()

@@ -1,6 +1,7 @@
 import { clsx } from 'clsx'
 import { CloudOff, Gauge, Pencil, Plus, Tractor, UserPlus, Wrench } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Badge, Button, Card, Carregando, Erro, Field, Input, PageHeader, Select, Sheet, Textarea, Vazio } from '@/components/ui'
 import { useToast } from '@/components/Toast'
 import { ApiError } from '@/lib/api'
@@ -154,6 +155,15 @@ function VeiculoSheet({ aberto, onFechar, veiculo }: { aberto: boolean; onFechar
 export default function Frota() {
   const { data, isLoading, error, refetch } = useDados<Veiculo[]>('/veiculos')
   const [editando, setEditando] = useState<{ veiculo?: Veiculo } | null>(null)
+
+  // Atalho do roteiro de primeiros passos: ?novo=1 abre o cadastro.
+  const [params, setParams] = useSearchParams()
+  useEffect(() => {
+    if (params.get('novo') === '1') {
+      setEditando({})
+      setParams({}, { replace: true })
+    }
+  }, [params, setParams])
   const [alocando, setAlocando] = useState<Veiculo>()
   const { data: talhoes = [] } = useDados<Talhao[]>('/talhoes')
   const { operadores, alocacaoPorVeiculo } = useEquipe({ veiculos: data ?? [], talhoes })

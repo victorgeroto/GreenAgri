@@ -1,5 +1,6 @@
-import { CalendarOff, CloudOff, Search, Square, Tractor, UserCheck, UserPlus, Users } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { CalendarOff, CloudOff, Search, Square, Tractor, UserCheck, UserPlus, Users, Plus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Abas, Badge, Button, Card, Carregando, Erro, Indicador, Indicadores, Input, PageHeader, Segmentado, Vazio } from '@/components/ui'
 import { useConfirmar } from '@/components/Confirmar'
 import { useToast } from '@/components/Toast'
@@ -7,6 +8,7 @@ import { ATIVIDADES, fmtData, fmtHora, fmtRelativo, FUNCOES, SITUACOES, TIPOS_VE
 import type { Alocacao, Operador, SituacaoOperador, Talhao, Veiculo } from '@/lib/types'
 import { useDados } from '@/offline/hooks'
 import { AlocarSheet } from './AlocarSheet'
+import { OperadorSheet } from './OperadorSheet'
 import { Avatar, resumoAtividade } from './componentes'
 import { useEncerrar, useEquipe } from './hooks'
 
@@ -161,6 +163,16 @@ export default function Equipe() {
   const [filtro, setFiltro] = useState<Filtro>('TODOS')
   const [busca, setBusca] = useState('')
   const [alocando, setAlocando] = useState<{ operador?: Operador } | null>(null)
+  const [novoOperador, setNovoOperador] = useState(false)
+
+  // Atalho do roteiro de primeiros passos: ?novo=1 abre o cadastro.
+  const [params, setParams] = useSearchParams()
+  useEffect(() => {
+    if (params.get('novo') === '1') {
+      setNovoOperador(true)
+      setParams({}, { replace: true })
+    }
+  }, [params, setParams])
 
   const conta = (s: SituacaoOperador) => operadores.filter((o) => o.situacao === s).length
   const maquinasLivres = veiculos.filter((v) => v.status === 'DISPONIVEL' && !alocacaoPorVeiculo.has(v.id)).length
@@ -176,7 +188,12 @@ export default function Equipe() {
       <PageHeader
         titulo="Equipe de campo"
         subtitulo="Quem está disponível hoje, quem está em atividade e em qual máquina ou talhão."
-        acoes={<Button icon={UserPlus} onClick={() => setAlocando({})}>Alocar em atividade</Button>}
+        acoes={
+          <>
+            <Button variant="secondary" icon={Plus} onClick={() => setNovoOperador(true)}>Novo operador</Button>
+            <Button icon={UserPlus} onClick={() => setAlocando({})}>Alocar em atividade</Button>
+          </>
+        }
       />
 
       <Indicadores className="mb-5">
@@ -222,7 +239,7 @@ export default function Equipe() {
             </div>
           </div>
           {filtrados.length === 0 ? (
-            <Vazio icon={Users} titulo="Nenhum operador neste filtro" />
+            <Vazio icon={Users} titulo={operadores.length ? 'Nenhum operador neste filtro' : 'Nenhum operador cadastrado'} acao={operadores.length ? undefined : <Button icon={Plus} onClick={() => setNovoOperador(true)}>Novo operador</Button>} />
           ) : (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {filtrados.map((o) => (
@@ -233,6 +250,7 @@ export default function Equipe() {
         </>
       )}
 
+      <OperadorSheet aberto={novoOperador} onFechar={() => setNovoOperador(false)} />
       <AlocarSheet
         aberto={!!alocando}
         onFechar={() => setAlocando(null)}
