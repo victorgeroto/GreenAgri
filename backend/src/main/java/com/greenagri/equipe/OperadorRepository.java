@@ -13,6 +13,8 @@ public interface OperadorRepository extends JpaRepository<Operador, Long> {
 
 	List<Operador> findByAtivoTrueOrderByNomeAsc();
 
+	boolean existsByMatriculaIgnoreCase(String matricula);
+
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("select o from Operador o where o.id = :id")
 	Optional<Operador> findComBloqueioById(Long id);

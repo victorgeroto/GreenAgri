@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.greenagri.equipe.EquipeDtos.AlocacaoRequest;
 import com.greenagri.equipe.EquipeDtos.AlocacaoResponse;
+import com.greenagri.equipe.EquipeDtos.OperadorRequest;
 import com.greenagri.equipe.EquipeDtos.OperadorResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,13 @@ public class EquipeController {
 	@Operation(summary = "Operadores com situação (disponível, em atividade, ausente) e habilitações")
 	public List<OperadorResponse> operadores() {
 		return service.listar();
+	}
+
+	@PostMapping("/operadores")
+	@ResponseStatus(HttpStatus.CREATED)
+	@Operation(summary = "Cadastra um operador na fazenda selecionada")
+	public OperadorResponse criarOperador(@Valid @RequestBody OperadorRequest req) {
+		return service.criarOperador(req);
 	}
 
 	@GetMapping("/operadores/{id}/alocacoes")

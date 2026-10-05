@@ -45,6 +45,19 @@ class EquipeIntegrationTest {
 	}
 
 	@Test
+	void cadastraOperadorComMatriculaUnicaNaFazenda() throws Exception {
+		String corpo = """
+				{"matricula":"op-100","nome":"Novo Operador","funcao":"TRATORISTA","turno":"MANHA","habilitacoes":["TRATOR"]}
+				""";
+		mvc.perform(post("/api/equipe/operadores").with(operador()).contentType(MediaType.APPLICATION_JSON).content(corpo))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.matricula").value("OP-100"))
+			.andExpect(jsonPath("$.situacao").value("DISPONIVEL"));
+		mvc.perform(post("/api/equipe/operadores").with(operador()).contentType(MediaType.APPLICATION_JSON).content(corpo))
+			.andExpect(status().isUnprocessableEntity());
+	}
+
+	@Test
 	void listaMostraSituacaoDeCadaOperador() throws Exception {
 		mvc.perform(get("/api/equipe/operadores").with(operador()))
 			.andExpect(status().isOk())

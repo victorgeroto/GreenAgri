@@ -3,9 +3,11 @@ package com.greenagri.equipe;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import com.greenagri.frota.TipoVeiculo;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -13,6 +15,15 @@ import jakarta.validation.constraints.Size;
 public final class EquipeDtos {
 
 	private EquipeDtos() {
+	}
+
+	public record OperadorRequest(
+			@NotBlank @Size(max = 20) String matricula,
+			@NotBlank @Size(max = 120) String nome,
+			@NotNull Funcao funcao,
+			@NotNull Turno turno,
+			@Size(max = 5) String cnhCategoria,
+			Set<TipoVeiculo> habilitacoes) {
 	}
 
 	public record AlocacaoRequest(

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.greenagri.equipe.EquipeDtos.AlocacaoRequest;
 import com.greenagri.equipe.EquipeDtos.AlocacaoResponse;
+import com.greenagri.equipe.EquipeDtos.OperadorRequest;
 import com.greenagri.equipe.EquipeDtos.OperadorResponse;
 import com.greenagri.frota.StatusVeiculo;
 import com.greenagri.frota.TipoVeiculo;
@@ -53,6 +55,26 @@ public class EquipeService {
 					situacao == Situacao.AUSENTE ? o.getMotivoAusencia() : null,
 					atual == null ? null : AlocacaoResponse.de(atual));
 		}).toList();
+	}
+
+	/** Cadastra um operador na fazenda selecionada (matrícula única por fazenda). */
+	@Transactional
+	public OperadorResponse criarOperador(OperadorRequest req) {
+		String matricula = req.matricula().trim().toUpperCase();
+		if (operadores.existsByMatriculaIgnoreCase(matricula)) {
+			throw new RegraNegocioException("Já existe um operador com a matrícula " + matricula);
+		}
+		Operador o = new Operador();
+		o.setMatricula(matricula);
+		o.setNome(req.nome().trim());
+		o.setFuncao(req.funcao());
+		o.setTurno(req.turno());
+		o.setCnhCategoria(req.cnhCategoria() == null || req.cnhCategoria().isBlank() ? null : req.cnhCategoria().trim().toUpperCase());
+		o.setHabilitacoes(req.habilitacoes() == null || req.habilitacoes().isEmpty() ? EnumSet.noneOf(TipoVeiculo.class)
+				: EnumSet.copyOf(req.habilitacoes()));
+		operadores.save(o);
+		return new OperadorResponse(o.getId(), o.getMatricula(), o.getNome(), o.getFuncao(), o.getTurno(),
+				o.getCnhCategoria(), o.getHabilitacoes().stream().sorted().toList(), Situacao.DISPONIVEL, null, null, null);
 	}
 
 	@Transactional(readOnly = true)
