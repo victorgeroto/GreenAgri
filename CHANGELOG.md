@@ -2,6 +2,18 @@
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o versionamento segue o [SemVer](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+### Adicionado
+- Roteiro de **Primeiros passos** para fazendas novas, com busca do local no mapa (OpenStreetMap), GPS ou toque no mapa.
+- Cadastro de operadores pela tela de Equipe.
+- **Central de notificações** com contador, leitura e avisos no aparelho (notificação do sistema).
+- Foto nos lançamentos de estoque.
+- Diálogos de confirmação e avisos no visual do app (no lugar das caixas do navegador).
+
+### Corrigido
+- A janela nativa de usuário e senha do navegador podia aparecer quando um servidor antigo pedia autenticação Basic.
+
 ## [1.1.0] - 2026-10-02
 
 ### Adicionado
