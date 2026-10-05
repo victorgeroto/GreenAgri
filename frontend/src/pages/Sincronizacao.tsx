@@ -2,11 +2,14 @@ import { CheckCircle2, CloudOff, RefreshCw, RotateCcw, Trash2, XCircle } from 'l
 import { Badge, Button, Card, PageHeader, Vazio } from '@/components/ui'
 import { useToast } from '@/components/Toast'
 import { fmtDataHora, fmtRelativo } from '@/lib/format'
+import { useFazenda } from '@/fazenda/FazendaContext'
 import { useSync } from '@/offline/SyncContext'
 import { descartar, tentarNovamente } from '@/offline/sync'
 
 export default function Sincronizacao() {
-  const { online, fila, pendentes, falhas, sincronizando, ultimaSincronizacao, sincronizar } = useSync()
+  const { online, filaTotal: fila, pendentes, falhas, sincronizando, ultimaSincronizacao, sincronizar } = useSync()
+  const { fazendas } = useFazenda()
+  const nomeDa = (id?: number) => fazendas.find((f) => f.id === id)?.nome
   const toast = useToast()
 
   async function sincronizarAgora() {
@@ -45,6 +48,7 @@ export default function Sincronizacao() {
                 {item.status === 'pendente' ? <CloudOff className="mt-0.5 h-5 w-5 text-amber-600" /> : <XCircle className="mt-0.5 h-5 w-5 text-red-600" />}
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{item.descricao}</p>
+                  {fazendas.length > 1 && nomeDa(item.fazendaId) && <p className="text-xs text-stone-500">{nomeDa(item.fazendaId)}</p>}
                   <p className="text-xs text-stone-500">
                     Registrado {fmtDataHora(new Date(item.criadoEm).toISOString())}
                     {item.tentativas > 0 && ` · ${item.tentativas} tentativa(s)`}

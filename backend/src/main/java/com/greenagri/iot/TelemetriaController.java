@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.greenagri.fazenda.ContextoFazenda;
 import com.greenagri.iot.IotDtos.TelemetriaRequest;
 import com.greenagri.iot.IotDtos.TelemetriaResponse;
 
@@ -33,6 +34,9 @@ public class TelemetriaController {
 			description = "Autenticação via header X-Device-Key. Leituras repetidas (mesmo instante) são ignoradas.")
 	public TelemetriaResponse receber(@RequestHeader("X-Device-Key") String apiKey,
 			@Valid @RequestBody TelemetriaRequest req) {
-		return service.receber(req, apiKey);
+		// O dispositivo não tem usuário: descobre a fazenda dele e processa o lote dentro dela,
+		// para leituras, alertas e geofence ficarem restritos à mesma fazenda.
+		Long fazendaId = service.fazendaDoDispositivo(req.codigo(), apiKey);
+		return ContextoFazenda.executar(fazendaId, () -> service.receber(req, apiKey));
 	}
 }

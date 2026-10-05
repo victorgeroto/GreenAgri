@@ -298,3 +298,15 @@ export interface Operador {
   motivoAusencia?: string
   alocacaoAtual?: Alocacao
 }
+
+export interface Fazenda {
+  id: number
+  nome: string
+  municipio: string
+  /** Sigla do estado. */
+  uf: string
+  latitude?: number
+  longitude?: number
+}
+
+export type FazendaInput = Omit<Fazenda, 'id'>

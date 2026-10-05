@@ -6,6 +6,8 @@ import java.util.Set;
 
 import com.greenagri.frota.TipoVeiculo;
 
+import org.hibernate.annotations.TenantId;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -32,6 +34,11 @@ public class Operador {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	/** Fazenda dona do registro: preenchida na gravação e aplicada como filtro em toda consulta. */
+	@TenantId
+	@Column(name = "fazenda_id", nullable = false, updatable = false)
+	private Long fazendaId;
 
 	private String matricula;
 

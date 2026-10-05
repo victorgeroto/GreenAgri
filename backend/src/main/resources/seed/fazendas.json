@@ -1,0 +1,4 @@
+[
+  { "codigo": "santa-helena", "nome": "Fazenda Santa Helena", "municipio": "Cascavel", "uf": "PR", "latitude": -24.88, "longitude": -53.56 },
+  { "codigo": "boa-vista", "nome": "Fazenda Boa Vista", "municipio": "Rio Verde", "uf": "GO", "latitude": -17.88, "longitude": -51.10 }
+]

@@ -1,11 +1,10 @@
-import { clsx } from 'clsx'
 import { ArrowLeftRight, ArrowRight, BellRing, ChevronRight, Droplets, Package, Radio, Thermometer, Tractor, Wheat } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
+import { localDaFazenda, useFazenda } from '@/fazenda/FazendaContext'
 import { Carrossel } from '@/components/Carrossel'
 import { ImagemProduto } from '@/components/ImagemProduto'
-import { FAZENDA } from '@/components/Layout'
 import { Badge, Button, Carregando, Erro, Indicador, Indicadores, PageHeader, Painel as Bloco } from '@/components/ui'
 import { diasAte, fmtData, fmtNumero, fmtQtd, fmtRelativo, hojeISO, safraDe, STATUS_COLHEITA } from '@/lib/format'
 import type { Colheita, Dispositivo, Operador, ResumoDashboard } from '@/lib/types'
@@ -38,6 +37,7 @@ function DadoHero({ rotulo, valor, icon: Icon }: { rotulo: string; valor: ReactN
 
 export default function Painel() {
   const { usuario } = useAuth()
+  const { atual: fazenda } = useFazenda()
   const { data: r, isLoading, error, refetch } = useDados<ResumoDashboard>('/dashboard', { refetchInterval: 60_000 })
   const { data: dispositivos = [] } = useDados<Dispositivo[]>('/iot/dispositivos', { refetchInterval: 60_000 })
   const { data: colheitas = [] } = useDados<Colheita[]>('/colheitas')
@@ -67,7 +67,7 @@ export default function Painel() {
       <Carrossel className="mb-5 h-[400px] rounded-lg sm:h-[340px]">
         <div className="max-w-3xl">
           <p className="text-xs font-medium text-white/70">
-            {FAZENDA.nome} · {FAZENDA.local}
+            {fazenda?.nome} · {localDaFazenda(fazenda)}
           </p>
           <p className="mt-0.5 text-xl font-semibold tracking-tight sm:text-2xl">Safra {safraAtual}</p>
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-white/15 pt-3 sm:grid-cols-4">
@@ -117,6 +117,7 @@ export default function Painel() {
 
       <div className="grid items-start gap-5 lg:grid-cols-3">
         <Bloco className="lg:col-span-2" titulo="Últimas movimentações de estoque" descricao={`${r.movimentacoes30d} lançamentos nos últimos 30 dias`} acao={<VerTudo to="/estoque" />} semPadding>
+          {r.ultimasMovimentacoes.length === 0 && <p className="px-4 py-6 text-center text-sm text-stone-500">Nenhuma movimentação ainda.</p>}
           <ul className="divide-y divide-stone-100 px-4">
             {r.ultimasMovimentacoes.map((m) => (
               <MovimentacaoItem key={m.id} m={m} />
@@ -154,6 +155,7 @@ export default function Painel() {
         </Bloco>
 
         <Bloco titulo="Próximas colheitas" acao={<VerTudo to="/colheitas" />} semPadding>
+          {r.proximasColheitas.length === 0 && <p className="px-4 py-6 text-center text-sm text-stone-500">Nenhuma colheita prevista.</p>}
           <ul className="divide-y divide-stone-100">
             {r.proximasColheitas.map((c) => {
               const dias = diasAte(c.previsaoColheita)
@@ -179,6 +181,7 @@ export default function Painel() {
           acao={<VerTudo to="/equipe">Alocar equipe</VerTudo>}
           semPadding
         >
+          {!equipe.some((o) => o.alocacaoAtual) && <p className="px-4 py-6 text-center text-sm text-stone-500">Ninguém em atividade agora.</p>}
           <ul className="grid divide-y divide-stone-100 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-3">
             {equipe.filter((o) => o.alocacaoAtual).map((o) => (
               <li key={o.id} className="flex items-center gap-3 px-4 py-3">
@@ -193,9 +196,6 @@ export default function Painel() {
         </Bloco>
       </div>
 
-      <p className={clsx('mt-6 text-center text-xs text-stone-400')}>
-        Dados de demonstração · {FAZENDA.nome}
-      </p>
 
       <MovimentarSheet aberto={lancando} onFechar={() => setLancando(false)} produtos={produtos} />
     </>

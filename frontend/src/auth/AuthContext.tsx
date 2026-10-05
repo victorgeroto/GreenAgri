@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { api, setUnauthorizedHandler, tokenStore } from '@/lib/api'
+import { api, setUnauthorizedHandler, fazendaStore, tokenStore } from '@/lib/api'
 import type { TokenResponse, Usuario } from '@/lib/types'
 import { limparCache } from '@/offline/cache'
 
@@ -47,7 +47,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (email: string, senha: string) => {
       const anterior = usuario?.email
       const r = await api<TokenResponse>('/auth/login', { method: 'POST', body: { email, senha } })
-      if (anterior && anterior !== r.usuario.email) await limparCache()
+      if (anterior && anterior !== r.usuario.email) {
+        await limparCache()
+        fazendaStore.clear()
+      }
       iniciarSessao(r)
       await queryClient.invalidateQueries()
     },
@@ -63,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const sair = useCallback(async () => {
     tokenStore.clear()
+    fazendaStore.clear()
     localStorage.removeItem(USUARIO_KEY)
     await limparCache()
     queryClient.clear()

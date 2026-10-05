@@ -1,0 +1,9 @@
+[
+  { "matricula": "OP-001", "nome": "Paulo Henrique Duarte", "funcao": "OPERADOR_MAQUINAS", "turno": "INTEGRAL", "cnh": "C",
+    "habilitacoes": ["TRATOR", "PULVERIZADOR", "COLHEITADEIRA"],
+    "alocacao": { "atividade": "PULVERIZACAO", "veiculo": "BV-PV01", "talhao": "P-01", "descricao": "Aplicação de fungicida no feijão", "horasAtras": 2, "horasPrevistas": 5 } },
+  { "matricula": "OP-002", "nome": "Fernanda Gomes", "funcao": "TECNICO_AGRICOLA", "turno": "MANHA", "cnh": "B",
+    "habilitacoes": ["UTILITARIO"] },
+  { "matricula": "OP-003", "nome": "Sebastião Nunes", "funcao": "TRATORISTA", "turno": "TARDE", "cnh": "C",
+    "habilitacoes": ["TRATOR"] }
+]

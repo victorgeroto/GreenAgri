@@ -6,6 +6,9 @@ import java.time.Instant;
 import com.greenagri.frota.Veiculo;
 import com.greenagri.produto.Produto;
 
+import org.hibernate.annotations.TenantId;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,6 +33,11 @@ public class Dispositivo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	/** Fazenda dona do registro: preenchida na gravação e aplicada como filtro em toda consulta. */
+	@TenantId
+	@Column(name = "fazenda_id", nullable = false, updatable = false)
+	private Long fazendaId;
 
 	/** Identificador gravado no firmware (ex.: SILO-01). */
 	private String codigo;

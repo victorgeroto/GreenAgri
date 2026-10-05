@@ -2,6 +2,20 @@
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o versionamento segue o [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.1.0] - 2026-10-02
+
+### Adicionado
+- **Várias fazendas na mesma conta**: seletor no menu (e no cabeçalho do celular), cadastro de fazenda nova com "usar minha localização" e tela de primeiro acesso para contas sem fazenda.
+- Dados separados por fazenda: estoque, talhões, safras, frota, equipe, sensores e alertas. Os mesmos códigos podem existir em fazendas diferentes.
+- Controle de acesso: cada usuário só vê e altera as fazendas de que é membro.
+- Segunda fazenda de demonstração: Fazenda Boa Vista (Rio Verde/GO), com pivô de irrigação.
+- Cache offline e fila de sincronização por fazenda: o lançamento feito sem sinal vai para a fazenda de origem.
+
+### Corrigido
+- Diálogos abertos pelo cabeçalho no celular ficavam cortados no topo da tela.
+- O mesmo usuário podia cadastrar duas fazendas com o mesmo nome.
+- A foto da tela de entrada aparecia borrada: agora usa só as fotos de maior resolução, exportadas com mais qualidade.
+
 ## [1.0.0] - 2026-10-02
 
 Primeira versão da reestruturação completa do GreenAgri: o site em HTML e JavaScript virou uma API Java e um app React que funciona offline.
@@ -29,4 +43,5 @@ Primeira versão da reestruturação completa do GreenAgri: o site em HTML e Jav
 - Encerrar uma atividade da equipe gravava, mas respondia com erro 500.
 - Trocar a unidade de um produto com saldo corrompia o estoque; agora é bloqueado.
 
+[1.1.0]: https://github.com/victorgeroto/GreenAgri/releases/tag/v1.1.0
 [1.0.0]: https://github.com/victorgeroto/GreenAgri/releases/tag/v1.0.0

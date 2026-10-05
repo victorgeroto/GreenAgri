@@ -31,6 +31,15 @@ public class TelemetriaService {
 	private final AlertaRepository alertas;
 	private final GeofenceService geofence;
 
+	/** Autentica o dispositivo (em modo raiz, antes de haver fazenda selecionada) e devolve a fazenda dele. */
+	@Transactional(readOnly = true)
+	public Long fazendaDoDispositivo(String codigo, String apiKey) {
+		return dispositivos.findByCodigo(codigo)
+			.filter(d -> ChaveDispositivo.confere(apiKey, d.getApiKeyHash()))
+			.map(Dispositivo::getFazendaId)
+			.orElseThrow(() -> new BadCredentialsException("Dispositivo ou chave inválidos"));
+	}
+
 	@Transactional
 	public TelemetriaResponse receber(TelemetriaRequest req, String apiKey) {
 		Dispositivo dispositivo = dispositivos.findByCodigo(req.codigo())

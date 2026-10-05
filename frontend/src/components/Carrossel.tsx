@@ -16,6 +16,9 @@ export const FOTOS_CAMPO: Foto[] = [
   { src: '/img/campo/adubacao-lanco.jpg', titulo: 'Adubação a lanço', legenda: 'Distribuição de fertilizante após a colheita, preparando a próxima safra.' },
 ]
 
+/** Login: painel alto (≈770×900), então só as fotos com resolução para esse recorte. */
+export const FOTOS_LOGIN: Foto[] = FOTOS_CAMPO.filter((f) => /lavoura-emergencia|preparo-palhada/.test(f.src))
+
 const INTERVALO_MS = 6000
 
 interface Props {

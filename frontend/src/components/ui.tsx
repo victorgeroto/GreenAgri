@@ -10,6 +10,7 @@ import {
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
@@ -202,7 +203,9 @@ export function Sheet({ aberto, titulo, onFechar, children }: { aberto: boolean;
   }, [aberto, onFechar])
 
   if (!aberto) return null
-  return (
+  // Portal no <body>: ancestrais com backdrop-filter ou sticky (cabeçalho, menu lateral)
+  // virariam o contêiner do position: fixed e cortariam o diálogo.
+  return createPortal(
     <div className="fixed inset-0 z-[1100] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal aria-label={titulo}>
       <div className="absolute inset-0 bg-stone-950/40" onClick={onFechar} />
       <div className="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-xl bg-white shadow-pop sm:max-w-lg sm:rounded-xl">
@@ -214,7 +217,8 @@ export function Sheet({ aberto, titulo, onFechar, children }: { aberto: boolean;
         </div>
         <div className="overflow-y-auto px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
