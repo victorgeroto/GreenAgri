@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/auth/AuthContext'
 import { ImagemProduto } from '@/components/ImagemProduto'
 import { Badge, Barra, Button, Card, Carregando, Painel, Vazio } from '@/components/ui'
+import { useConfirmar } from '@/components/Confirmar'
 import { useToast } from '@/components/Toast'
 import { api } from '@/lib/api'
 import { CATEGORIAS, fmtDataHora, fmtQtd } from '@/lib/format'
@@ -21,6 +22,7 @@ export default function ProdutoDetalhe() {
   const { usuario } = useAuth()
   const { online } = useSync()
   const toast = useToast()
+  const confirmar = useConfirmar()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [movimentando, setMovimentando] = useState(false)
@@ -31,7 +33,7 @@ export default function ProdutoDetalhe() {
   if (!p) return <Vazio icon={History} titulo="Produto não encontrado" acao={<Link to="/estoque" className="text-brand-700">Voltar ao estoque</Link>} />
 
   async function excluir() {
-    if (!p || !confirm(`Excluir "${p.nome}" e todo o seu histórico?`)) return
+    if (!p || !(await confirmar({ titulo: `Excluir ${p.nome}?`, mensagem: 'O produto e todo o histórico de movimentações serão apagados. Isso não pode ser desfeito.', confirmar: 'Excluir', perigo: true }))) return
     try {
       await api(`/produtos/${p.id}`, { method: 'DELETE' })
       await queryClient.invalidateQueries()
