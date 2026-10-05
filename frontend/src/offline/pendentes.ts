@@ -59,6 +59,7 @@ export function historicoComPendentes(
         saldoApos,
         motivo: m.motivo,
         idCliente: m.idCliente,
+        foto: m.foto,
         ocorridoEm: m.ocorridoEm,
         registradoEm: m.ocorridoEm,
         pendente: true,
