@@ -48,6 +48,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff2}'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/],
+        // Abre a tela do aviso ao tocar numa notificação do sistema.
+        importScripts: ['sw-notificacoes.js'],
         // Imagens do mapa já vistas ficam disponíveis offline. Só guarda o que o usuário abriu
         // (sem pré-download em massa, que a política de uso do OpenStreetMap proíbe).
         runtimeCaching: [

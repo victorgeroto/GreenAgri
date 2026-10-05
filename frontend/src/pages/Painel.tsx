@@ -3,11 +3,12 @@ import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
 import { localDaFazenda, useFazenda } from '@/fazenda/FazendaContext'
+import { PrimeirosPassos } from '@/fazenda/PrimeirosPassos'
 import { Carrossel } from '@/components/Carrossel'
 import { ImagemProduto } from '@/components/ImagemProduto'
 import { Badge, Button, Carregando, Erro, Indicador, Indicadores, PageHeader, Painel as Bloco } from '@/components/ui'
 import { diasAte, fmtData, fmtNumero, fmtQtd, fmtRelativo, hojeISO, safraDe, STATUS_COLHEITA } from '@/lib/format'
-import type { Colheita, Dispositivo, Operador, ResumoDashboard } from '@/lib/types'
+import type { Colheita, Dispositivo, Operador, ResumoDashboard, Talhao, Veiculo } from '@/lib/types'
 import { useDados } from '@/offline/hooks'
 import { Reconciliacao } from './campo/componentes'
 import { Avatar, resumoAtividade } from './equipe/componentes'
@@ -42,6 +43,8 @@ export default function Painel() {
   const { data: dispositivos = [] } = useDados<Dispositivo[]>('/iot/dispositivos', { refetchInterval: 60_000 })
   const { data: colheitas = [] } = useDados<Colheita[]>('/colheitas')
   const { data: equipe = [] } = useDados<Operador[]>('/equipe/operadores', { refetchInterval: 60_000 })
+  const { data: talhoes = [] } = useDados<Talhao[]>('/talhoes')
+  const { data: veiculos = [] } = useDados<Veiculo[]>('/veiculos')
   const { produtos } = useProdutos()
   const [lancando, setLancando] = useState(false)
 
@@ -63,6 +66,8 @@ export default function Painel() {
         subtitulo={`Olá, ${usuario?.nome.split(' ')[0]}. Resumo da operação de hoje.`}
         acoes={<Button icon={ArrowLeftRight} onClick={() => setLancando(true)}>Lançar no estoque</Button>}
       />
+
+      {fazenda && <PrimeirosPassos fazenda={fazenda} contagens={{ talhoes: talhoes.length, produtos: r.produtos, veiculos: veiculos.length, operadores: r.operadores }} />}
 
       <Carrossel className="mb-5 h-[400px] rounded-lg sm:h-[340px]">
         <div className="max-w-3xl">

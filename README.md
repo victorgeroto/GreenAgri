@@ -22,6 +22,12 @@
 - Ao cadastrar uma fazenda, informe nome, município e estado. Toque em **Usar minha localização** para o mapa já abrir na sede.
 - Cada pessoa só vê as fazendas a que tem acesso. Quem cadastra uma fazenda passa a ter acesso a ela.
 - **Offline:** um lançamento feito sem sinal vai para a fazenda em que foi feito, mesmo que você troque de fazenda antes de o sinal voltar.
+- **Fazenda nova começa zerada**, com um roteiro de **Primeiros passos** na visão geral: encontrar a fazenda no mapa (busca pelo nome do lugar, GPS ou toque no mapa), desenhar os talhões, cadastrar o estoque, as máquinas e a equipe. Cada etapa leva direto ao cadastro, e o roteiro some quando tudo estiver pronto.
+
+### Notificações
+- O **sino** no topo reúne os avisos da fazenda: alertas dos sensores, produtos abaixo do mínimo, revisões de máquina e lançamentos recusados na sincronização.
+- Tocar num aviso leva à tela certa e o marca como lido. Também dá para **marcar todos como lidos**.
+- Toque em **Avisar neste aparelho** para receber os alertas importantes como notificação do celular ou do computador, mesmo com o app em segundo plano.
 
 <p align="center">
   <img src="docs/img/desktop-fazendas.png" width="760" alt="Seletor de fazendas no menu lateral">
@@ -70,6 +76,7 @@
 ### Frota
 - Tratores, colheitadeiras, pulverizadores, caminhões e utilitários num só lugar.
 - Atualize o horímetro (ou o odômetro) e a data da próxima revisão. O app destaca as revisões que vencem em até 7 dias.
+- Lançamentos aceitam **foto** (carga recebida, nota fiscal, produto despachado), que aparece no histórico.
 - Cada máquina mostra **quem está operando** e tem o atalho **Alocar operador** (ou *Alocar mecânico*, se estiver na oficina).
 
 ### Equipe de campo
@@ -106,6 +113,16 @@ O GreenAgri foi feito para quem trabalha onde o sinal cai.
 Se o servidor recusar algum lançamento (por exemplo, uma saída maior que o saldo real), ele aparece em **Sincronização**, com o motivo. Ali você pode tentar de novo ou descartar.
 
 > Dica: sair da conta apaga os dados guardados no aparelho. Se houver lançamentos na fila, o app avisa antes.
+
+## Usar no celular
+
+Com o celular e o computador na mesma rede Wi-Fi:
+
+1. Suba o backend normalmente.
+2. Suba o frontend liberado para a rede: `npm run dev -- --host`
+3. Abra no celular o endereço da linha `Network` que o Vite mostra (ex.: `http://192.168.0.10:5173`). Para descobrir o IP do computador, use `ipconfig` e veja o "Endereço IPv4". Se o Windows perguntar, permita o Node.js no firewall em redes privadas.
+
+Pelo endereço da rede local o app funciona normalmente, mas **instalar na tela inicial, o modo offline e as notificações do aparelho exigem HTTPS**, porque o navegador só libera esses recursos em conexões seguras (ou em `localhost`). Para testar essas partes no celular, publique um endereço HTTPS temporário com um túnel gratuito, por exemplo `npx cloudflared tunnel --url http://localhost:5173`, e abra no celular o link `https://...trycloudflare.com` exibido.
 
 ## Instale na tela inicial
 

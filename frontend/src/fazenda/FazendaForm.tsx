@@ -1,10 +1,11 @@
-import { LocateFixed } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, Field, Input, Select, Sheet } from '@/components/ui'
 import { useToast } from '@/components/Toast'
 import { ApiError, NetworkError } from '@/lib/api'
 import type { FazendaInput } from '@/lib/types'
 import { useFazenda } from './FazendaContext'
+import { LocalizarFazenda } from './LocalizarFazenda'
 
 const UFS = ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO']
 
@@ -14,28 +15,12 @@ const vazio: FazendaInput = { nome: '', municipio: '', uf: 'PR' }
 export function FazendaForm({ onCriada }: { onCriada?: () => void }) {
   const { criar } = useFazenda()
   const toast = useToast()
+  const navigate = useNavigate()
   const [f, setF] = useState<FazendaInput>(vazio)
   const [erro, setErro] = useState<string>()
   const [enviando, setEnviando] = useState(false)
-  const [localizando, setLocalizando] = useState(false)
 
   const set = <K extends keyof FazendaInput>(k: K, v: FazendaInput[K]) => setF((x) => ({ ...x, [k]: v }))
-
-  function usarLocalizacao() {
-    if (!navigator.geolocation) return setErro('Este aparelho não informa a localização')
-    setLocalizando(true)
-    navigator.geolocation.getCurrentPosition(
-      (p) => {
-        setF((x) => ({ ...x, latitude: +p.coords.latitude.toFixed(5), longitude: +p.coords.longitude.toFixed(5) }))
-        setLocalizando(false)
-      },
-      () => {
-        setErro('Não foi possível obter a localização. Informe as coordenadas ou deixe em branco.')
-        setLocalizando(false)
-      },
-      { enableHighAccuracy: true, timeout: 15_000 },
-    )
-  }
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
@@ -46,6 +31,7 @@ export function FazendaForm({ onCriada }: { onCriada?: () => void }) {
       toast('sucesso', `${nova.nome} cadastrada e selecionada`)
       setF(vazio)
       onCriada?.()
+      navigate('/') // a visão geral mostra o roteiro de primeiros passos
     } catch (err) {
       if (err instanceof NetworkError) setErro('Cadastrar uma fazenda precisa de conexão com o servidor.')
       else if (err instanceof ApiError && err.campos) setErro(Object.values(err.campos).join(' · '))
@@ -73,20 +59,13 @@ export function FazendaForm({ onCriada }: { onCriada?: () => void }) {
         </Field>
       </div>
       <div>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Latitude da sede">
-            {(id) => <Input id={id} type="number" step="any" min={-90} max={90} inputMode="decimal" value={f.latitude ?? ''} onChange={(e) => set('latitude', e.target.value ? Number(e.target.value) : undefined)} placeholder="-24.88" />}
-          </Field>
-          <Field label="Longitude da sede">
-            {(id) => <Input id={id} type="number" step="any" min={-180} max={180} inputMode="decimal" value={f.longitude ?? ''} onChange={(e) => set('longitude', e.target.value ? Number(e.target.value) : undefined)} placeholder="-53.56" />}
-          </Field>
-        </div>
-        <div className="mt-1.5 flex items-center justify-between gap-2">
-          <p className="text-xs text-stone-500">Opcional: centraliza o mapa enquanto não há talhões.</p>
-          <Button type="button" variant="ghost" size="sm" icon={LocateFixed} carregando={localizando} onClick={usarLocalizacao}>
-            Usar minha localização
-          </Button>
-        </div>
+        <p className="mb-1.5 text-[13px] font-medium text-stone-700">Onde fica a sede</p>
+        <LocalizarFazenda
+          valor={f.latitude != null && f.longitude != null ? { latitude: f.latitude, longitude: f.longitude } : undefined}
+          onChange={(p) => setF((x) => ({ ...x, ...p }))}
+          sugestao={[f.nome, f.municipio && `${f.municipio} ${f.uf}`].filter(Boolean).join(', ')}
+          alternativa={f.municipio ? `${f.municipio} ${f.uf}` : undefined}
+        />
       </div>
       {erro && <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
       <Button type="submit" className="w-full" carregando={enviando}>

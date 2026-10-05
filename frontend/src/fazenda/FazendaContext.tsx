@@ -12,6 +12,7 @@ interface FazendaState {
   carregando: boolean
   selecionar: (id: number) => void
   criar: (dados: FazendaInput) => Promise<Fazenda>
+  atualizar: (id: number, dados: FazendaInput) => Promise<Fazenda>
 }
 
 const FazendaContext = createContext<FazendaState | null>(null)
@@ -56,9 +57,18 @@ export function FazendaProvider({ children }: { children: ReactNode }) {
     [queryClient, selecionar],
   )
 
+  const atualizar = useCallback(
+    async (id: number, dados: FazendaInput) => {
+      const f = await api<Fazenda>(`/fazendas/${id}`, { method: 'PUT', body: dados })
+      await queryClient.invalidateQueries({ queryKey: ['fazendas'] })
+      return f
+    },
+    [queryClient],
+  )
+
   const value = useMemo(
-    () => ({ fazendas, atual, carregando: lista.isLoading, selecionar, criar }),
-    [fazendas, atual, lista.isLoading, selecionar, criar],
+    () => ({ fazendas, atual, carregando: lista.isLoading, selecionar, criar, atualizar }),
+    [fazendas, atual, lista.isLoading, selecionar, criar, atualizar],
   )
   return <FazendaContext.Provider value={value}>{children}</FazendaContext.Provider>
 }
