@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { CloudOff, Radio, Wheat } from 'lucide-react'
-import { Carrossel } from '@/components/Carrossel'
+import { Carrossel, FOTOS_LOGIN } from '@/components/Carrossel'
 import { Logo } from '@/components/Logo'
 import { useAuth } from '@/auth/AuthContext'
 import { Button, Field, Input } from '@/components/ui'
@@ -46,7 +46,7 @@ export function Login() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-      <Carrossel className="h-60 shrink-0 sm:h-72 lg:h-auto lg:min-h-screen">
+      <Carrossel fotos={FOTOS_LOGIN} className="h-60 shrink-0 sm:h-72 lg:h-auto lg:min-h-screen">
         <Logo tamanho={34} comNome claro subtitulo="Gestão agrícola conectada" className="mb-auto" />
         <div className="hidden max-w-lg lg:block">
           <h2 className="text-3xl font-semibold leading-tight tracking-tight">Do silo ao talhão, a gestão da fazenda em um só sistema.</h2>
