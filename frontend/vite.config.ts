@@ -7,6 +7,16 @@ import { VitePWA } from 'vite-plugin-pwa'
 // Backend para onde o dev server/preview encaminha /api (ex.: API_PROXY=http://localhost:8090).
 const API_PROXY = process.env.API_PROXY ?? 'http://localhost:8080'
 
+// O app trata o 401 sozinho (aviso de sessão expirada). Sem este cabeçalho o navegador
+// nunca abre a janela nativa de usuário e senha, mesmo que algum servidor peça Basic.
+const proxyApi = {
+  target: API_PROXY,
+  configure: (proxy: { on: (ev: 'proxyRes', fn: (res: { headers: Record<string, unknown> }) => void) => void }) =>
+    proxy.on('proxyRes', (res) => {
+      delete res.headers['www-authenticate']
+    }),
+}
+
 export default defineConfig({
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
@@ -57,13 +67,13 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': API_PROXY,
+      '/api': proxyApi,
     },
   },
   preview: {
     port: 4173,
     proxy: {
-      '/api': API_PROXY,
+      '/api': proxyApi,
     },
   },
   test: {
