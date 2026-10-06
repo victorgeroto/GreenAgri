@@ -14,6 +14,7 @@ const Frota = lazy(() => import('./pages/Frota'))
 const Equipe = lazy(() => import('./pages/equipe/Equipe'))
 const Campo = lazy(() => import('./pages/campo/Campo'))
 const DispositivoDetalhe = lazy(() => import('./pages/campo/DispositivoDetalhe'))
+const Perfil = lazy(() => import('./pages/Perfil'))
 const Sincronizacao = lazy(() => import('./pages/Sincronizacao'))
 
 const ROTAS: [string, ReactNode][] = [
@@ -26,6 +27,7 @@ const ROTAS: [string, ReactNode][] = [
   ['/campo', <Campo />],
   ['/campo/:id', <DispositivoDetalhe />],
   ['/sincronizacao', <Sincronizacao />],
+  ['/perfil', <Perfil />],
 ]
 
 function Protegida({ children }: { children: ReactNode }) {
