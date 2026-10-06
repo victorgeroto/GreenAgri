@@ -1,4 +1,4 @@
 [
-  { "nome": "Administrador GreenAgri", "email": "admin@greenagri.dev", "senha": "greenagri123", "perfil": "ADMIN", "fazendas": ["santa-helena", "boa-vista"] },
-  { "nome": "Operador de Campo", "email": "operador@greenagri.dev", "senha": "greenagri123", "perfil": "OPERADOR", "fazendas": ["santa-helena"] }
+  { "nome": "Administrador GreenAgri", "email": "admin@greenagri.dev", "perfil": "ADMIN", "fazendas": ["santa-helena", "boa-vista"] },
+  { "nome": "Operador de Campo", "email": "operador@greenagri.dev", "perfil": "OPERADOR", "fazendas": ["santa-helena"] }
 ]

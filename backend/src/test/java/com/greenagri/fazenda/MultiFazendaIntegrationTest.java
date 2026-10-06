@@ -119,7 +119,7 @@ class MultiFazendaIntegrationTest {
 	@Test
 	void telemetriaGravaNaFazendaDoDispositivo() throws Exception {
 		long agora = System.currentTimeMillis() / 1000 + 120;
-		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "dev-key-solo-t03")
+		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "teste-solo-t03")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content("{\"codigo\":\"SOLO-T03\",\"leituras\":[{\"ts\":%d,\"us\":33.3}]}".formatted(agora)))
 			.andExpect(status().isAccepted())

@@ -82,6 +82,7 @@ public class DataSeeder implements ApplicationRunner {
 
 	private final ObjectMapper mapper;
 	private final PasswordEncoder passwordEncoder;
+	private final CredenciaisDemo credenciais;
 	private final UsuarioRepository usuarios;
 	private final ProdutoRepository produtos;
 	private final EstoqueService estoqueService;
@@ -101,7 +102,7 @@ public class DataSeeder implements ApplicationRunner {
 
 	private final Random random = new Random(42);
 
-	record UsuarioSeed(String nome, String email, String senha, Perfil perfil, List<String> fazendas) {
+	record UsuarioSeed(String nome, String email, Perfil perfil, List<String> fazendas) {
 	}
 
 	record FazendaSeed(String codigo, String nome, String municipio, String uf, Double latitude, Double longitude) {
@@ -129,7 +130,7 @@ public class DataSeeder implements ApplicationRunner {
 	}
 
 	record DispositivoSeed(String codigo, String nome, TipoDispositivo tipo, String localizacao, Double latitude,
-			Double longitude, String apiKey, String firmware, String produtoSku, BigDecimal capacidadeKg,
+			Double longitude, String firmware, String produtoSku, BigDecimal capacidadeKg,
 			String veiculo, Simulacao simulacao) {
 	}
 
@@ -145,6 +146,9 @@ public class DataSeeder implements ApplicationRunner {
 		// Cada fazenda numa transação própria, com ela selecionada: o Hibernate preenche o fazenda_id.
 		criadas.forEach((codigo, fazenda) -> ContextoFazenda.executar(fazenda.getId(),
 				() -> tx.executeWithoutResult(s -> carregarFazenda(codigo, fazenda))));
+		credenciais.salvar(usuarios.findAll().stream().map(Usuario::getEmail).toList());
+		// Nunca registra a senha no log: ela fica só no arquivo local.
+		log.info("Credenciais de demonstração (local, fora do Git): {}", credenciais.caminho());
 	}
 
 	private Map<String, Fazenda> criarFazendasEUsuarios() {
@@ -160,7 +164,7 @@ public class DataSeeder implements ApplicationRunner {
 				porCodigo.put(s.codigo(), fazendas.save(f));
 			}
 			for (UsuarioSeed u : ler("usuarios", new TypeReference<List<UsuarioSeed>>() { })) {
-				Usuario usuario = usuarios.save(new Usuario(u.nome(), u.email(), passwordEncoder.encode(u.senha()), u.perfil()));
+				Usuario usuario = usuarios.save(new Usuario(u.nome(), u.email(), passwordEncoder.encode(credenciais.senha()), u.perfil()));
 				u.fazendas().forEach(codigo -> porCodigo.get(codigo).getMembros().add(usuario));
 			}
 			return porCodigo;
@@ -301,7 +305,7 @@ public class DataSeeder implements ApplicationRunner {
 			d.setLocalizacao(s.localizacao());
 			d.setLatitude(s.latitude());
 			d.setLongitude(s.longitude());
-			d.setApiKeyHash(ChaveDispositivo.hash(s.apiKey()));
+			d.setApiKeyHash(ChaveDispositivo.hash(credenciais.chave(s.codigo())));
 			d.setFirmwareVersao(s.firmware());
 			d.setProduto(s.produtoSku() == null ? null : porSku.get(s.produtoSku()));
 			d.setCapacidadeKg(s.capacidadeKg());
@@ -324,7 +328,7 @@ public class DataSeeder implements ApplicationRunner {
 				// A leitura atual passa pelo fluxo real de ingestão, disparando as regras de alerta.
 				telemetriaService.receber(
 						new TelemetriaRequest(s.codigo(), s.firmware(), List.of(simular(d, sim, 1, agora))),
-						s.apiKey());
+						credenciais.chave(s.codigo()));
 			}
 			else {
 				d.setUltimoContato(fim);

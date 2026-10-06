@@ -14,7 +14,15 @@
  *   API_URL=http://servidor:8080 node simulador.mjs
  */
 
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
+
+// Chaves geradas pelo backend na primeira execução (fora do Git): .greenagri-demo/credenciais.json
+const ARQUIVO = process.env.GREENAGRI_CREDENCIAIS ?? new URL('../../.greenagri-demo/credenciais.json', import.meta.url)
+if (!existsSync(ARQUIVO)) {
+  console.error('Credenciais de demonstração não encontradas. Suba o backend uma vez (perfil dev) para gerá-las.')
+  process.exit(1)
+}
+const CHAVES = JSON.parse(readFileSync(ARQUIVO, 'utf8')).dispositivos ?? {}
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((acc, a, i, arr) => (a.startsWith('--') ? [...acc, [a.slice(2), arr[i + 1]]] : acc), []),
@@ -24,15 +32,14 @@ const INTERVALO_S = Number(args.intervalo ?? 10)
 const CHANCE_QUEDA = Number(args.queda ?? 0.15)
 const CENARIO = args.cenario ?? 'normal' // normal | geada | seca | silo-quente
 
-// Chaves de demonstração (backend/src/main/resources/seed/dispositivos.json)
 const dispositivos = [
-  { codigo: 'EST-01', chave: 'dev-key-est-01', tipo: 'estacao', firmware: '1.2.0' },
-  { codigo: 'SOLO-T02', chave: 'dev-key-solo-t02', tipo: 'solo', firmware: '1.2.0', solo: 22 },
-  { codigo: 'SOLO-T03', chave: 'dev-key-solo-t03', tipo: 'solo', firmware: '1.1.4', solo: 37 },
-  { codigo: 'SILO-01', chave: 'dev-key-silo-01', tipo: 'silo', firmware: '2.0.1', nivel: 84.5, temp: 24 },
-  { codigo: 'SILO-02', chave: 'dev-key-silo-02', tipo: 'silo', firmware: '2.0.1', nivel: 66, temp: 31 },
-  { codigo: 'RAST-CH01', chave: 'dev-key-rast-ch01', tipo: 'rastreador', firmware: '1.0.0' },
-].map((d) => ({ ...d, buffer: [], bateria: 60 + Math.random() * 40 }))
+  { codigo: 'EST-01', tipo: 'estacao', firmware: '1.2.0' },
+  { codigo: 'SOLO-T02', tipo: 'solo', firmware: '1.2.0', solo: 22 },
+  { codigo: 'SOLO-T03', tipo: 'solo', firmware: '1.1.4', solo: 37 },
+  { codigo: 'SILO-01', tipo: 'silo', firmware: '2.0.1', nivel: 84.5, temp: 24 },
+  { codigo: 'SILO-02', tipo: 'silo', firmware: '2.0.1', nivel: 66, temp: 31 },
+  { codigo: 'RAST-CH01', tipo: 'rastreador', firmware: '1.0.0' },
+].map((d) => ({ ...d, chave: CHAVES[d.codigo], buffer: [], bateria: 60 + Math.random() * 40 }))
 
 const ruido = (a) => (Math.random() * 2 - 1) * a
 const r1 = (v) => Math.round(v * 10) / 10

@@ -78,7 +78,7 @@ export function Login() {
             <Field label="E-mail">
               {(id) => <Input id={id} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" placeholder="voce@fazenda.com.br" />}
             </Field>
-            <Field label="Senha" dica={modo === 'registrar' ? 'Mínimo de 8 caracteres' : undefined}>
+            <Field label="Senha" dica={modo === 'registrar' ? 'Mínimo de 10 caracteres, com letras e números. Evite seu nome ou e-mail.' : undefined}>
               {(id) => (
                 <Input
                   id={id}
@@ -86,7 +86,8 @@ export function Login() {
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   required
-                  minLength={modo === 'registrar' ? 8 : undefined}
+                  minLength={modo === 'registrar' ? 10 : undefined}
+                  maxLength={128}
                   autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'}
                 />
               )}
@@ -104,22 +105,6 @@ export function Login() {
             </button>
           </p>
 
-          {modo === 'entrar' && (
-            <div className="mt-8 rounded-md border border-stone-200 bg-stone-50 px-3.5 py-3 text-xs text-stone-600">
-              <p className="font-medium text-stone-800">Ambiente de demonstração</p>
-              <p className="mt-0.5 font-mono">admin@greenagri.dev · greenagri123</p>
-              <button
-                type="button"
-                className="mt-2 font-medium text-brand-700 hover:text-brand-900"
-                onClick={() => {
-                  setEmail('admin@greenagri.dev')
-                  setSenha('greenagri123')
-                }}
-              >
-                Preencher automaticamente
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>
