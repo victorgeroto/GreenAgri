@@ -9,6 +9,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Cadastro de operadores pela tela de Equipe.
 - **Central de notificações** com contador, leitura e avisos no aparelho (notificação do sistema).
 - Foto nos lançamentos de estoque.
+- Tela **Meu perfil**: dados da conta, edição do nome, troca de senha e fazendas com acesso.
 - Diálogos de confirmação e avisos no visual do app (no lugar das caixas do navegador).
 
 ### Segurança

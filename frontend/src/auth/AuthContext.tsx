@@ -13,6 +13,8 @@ interface AuthState {
   entrar: (email: string, senha: string) => Promise<void>
   registrar: (nome: string, email: string, senha: string) => Promise<void>
   sair: () => Promise<void>
+  /** Atualiza os dados guardados do usuário (ex.: após editar o nome no perfil). */
+  atualizarUsuario: (dados: Partial<Usuario>) => void
 }
 
 const AuthContext = createContext<AuthState | null>(null)
@@ -74,9 +76,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSessaoExpirada(false)
   }, [queryClient])
 
+  const atualizarUsuario = useCallback((dados: Partial<Usuario>) => {
+    setUsuario((u) => {
+      if (!u) return u
+      const novo = { ...u, ...dados }
+      localStorage.setItem(USUARIO_KEY, JSON.stringify(novo))
+      return novo
+    })
+  }, [])
+
   const value = useMemo(
-    () => ({ usuario, sessaoExpirada, entrar, registrar, sair }),
-    [usuario, sessaoExpirada, entrar, registrar, sair],
+    () => ({ usuario, sessaoExpirada, entrar, registrar, sair, atualizarUsuario }),
+    [usuario, sessaoExpirada, entrar, registrar, sair, atualizarUsuario],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

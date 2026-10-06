@@ -90,6 +90,16 @@
   <img src="docs/img/desktop-equipe.png" width="760" alt="Equipe de campo com operadores disponíveis, em atividade e ausentes">
 </p>
 
+### Meu perfil
+
+Toque no seu nome no menu lateral (ou no avatar, no topo, pelo celular) para abrir o perfil:
+
+- **Seus dados:** nome, e-mail, papel (administrador ou operador), data de cadastro e até quando a sessão vale.
+- **Edite o nome** exibido nos lançamentos e no menu.
+- **Troque a senha** informando a atual. A nova segue a política de senha forte, e erros repetidos bloqueiam novas tentativas por 15 minutos.
+- **Fazendas com acesso:** a lista das fazendas de que você participa, com um toque para trabalhar em cada uma.
+- **Sair da conta**, com aviso se houver lançamentos ainda não sincronizados.
+
 ### Campo conectado (IoT)
 - Veja em tempo real os sensores da fazenda: **estação meteorológica**, **umidade do solo** nos talhões, **nível e temperatura dos silos** e o **rastreador da colheitadeira** (posição, velocidade e trajeto).
 - Receba alertas de **risco de geada**, **solo seco** (hora de irrigar), **grão aquecendo no silo** (acionar aeração) e **bateria fraca**.
@@ -128,7 +138,7 @@ Pelo endereço da rede local o app funciona normalmente, mas **instalar na tela 
 
 O GreenAgri foi construído com segurança desde o início, seguindo o **OWASP Top 10** e a **LGPD**:
 
-- Senhas com bcrypt, política de senha forte e **bloqueio contra força bruta** no login.
+- Senhas com bcrypt, política de senha forte e **bloqueio contra força bruta** no login e na troca de senha.
 - Cada fazenda totalmente isolada no banco e acesso só de quem é membro.
 - Cabeçalhos de segurança (CSP, HSTS, proteção contra clickjacking), sem segredos no código e configuração de produção que **não sobe com senhas fracas**.
 - Registro de auditoria dos eventos de segurança, sem expor dados pessoais.

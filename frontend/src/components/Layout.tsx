@@ -147,12 +147,14 @@ export function Layout() {
         </nav>
 
         <div className="border-t border-white/10 p-3">
-          <div className="flex items-center gap-2.5 rounded-md px-2 py-1.5">
+          <div className="flex items-center gap-1">
+            <Link to="/perfil" className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2 py-1.5 hover:bg-white/5" title="Meu perfil">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-700 text-xs font-semibold">{iniciais(usuario?.nome)}</span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13px] font-medium">{usuario?.nome}</p>
               <p className="truncate text-xs text-white/50">{usuario?.perfil === 'ADMIN' ? 'Administrador' : 'Operador'}</p>
             </div>
+            </Link>
             <button onClick={confirmarSaida} className="rounded-md p-1.5 text-white/50 hover:bg-white/5 hover:text-white" aria-label="Sair" title="Sair">
               <LogOut className="h-4 w-4" />
             </button>
@@ -173,14 +175,14 @@ export function Layout() {
                   <span className="text-stone-300">/</span>
                 </>
               )}
-              <span className="font-medium text-stone-800">{atual?.label ?? 'Sincronização'}</span>
+              <span className="font-medium text-stone-800">{atual?.label ?? (pathname === '/perfil' ? 'Meu perfil' : 'Sincronização')}</span>
             </nav>
             <div className="flex items-center gap-2">
               <StatusSync />
               {fazenda.atual && <CentralNotificacoes />}
-              <button onClick={confirmarSaida} className="rounded-md p-2 text-stone-500 hover:bg-stone-100 lg:hidden" aria-label="Sair">
-                <LogOut className="h-4 w-4" />
-              </button>
+              <Link to="/perfil" className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-700 text-xs font-semibold text-white lg:hidden" aria-label="Meu perfil">
+                {iniciais(usuario?.nome)}
+              </Link>
             </div>
           </div>
           {sessaoExpirada && (

@@ -122,6 +122,8 @@ Exceto login, fazendas e telemetria, todas as rotas exigem o header `X-Fazenda-I
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/api/auth/login` · `/api/auth/registro` | Autenticação (público) |
+| GET · PUT | `/api/conta` | Perfil do usuário logado e edição do nome (sem cabeçalho de fazenda) |
+| POST | `/api/conta/senha` | Troca de senha (exige a atual; limite de tentativas) |
 | GET/POST | `/api/fazendas` | Fazendas do usuário / cadastra (quem cadastra ganha acesso) |
 | PUT | `/api/fazendas/{id}` | Edita nome, município, UF e coordenadas da sede |
 | GET/POST | `/api/produtos` | Lista (`?q=`, `?categoria=`) / cria |
