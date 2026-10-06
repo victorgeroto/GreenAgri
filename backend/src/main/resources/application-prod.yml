@@ -1,9 +1,22 @@
+# Produção: nenhum segredo tem valor padrão. Sem as variáveis, a aplicação não sobe.
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/greenagri}
-    username: ${DB_USER:greenagri}
-    password: ${DB_PASSWORD:greenagri}
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  h2:
+    console:
+      enabled: false
+
+# Documentação interativa da API desligada em produção (reduz a superfície exposta).
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 greenagri:
   seed:
     enabled: ${GREENAGRI_SEED:false}
+    senha: ${GREENAGRI_DEMO_SENHA:}
+    arquivo-credenciais: ${GREENAGRI_ARQUIVO_CREDENCIAIS:/tmp/greenagri-credenciais.json}

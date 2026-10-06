@@ -10,6 +10,7 @@ frontend/.vite/
 *.tsbuildinfo
 
 # Ambiente
+.greenagri-demo/
 .env
 .env.local
 *.log

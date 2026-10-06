@@ -2,6 +2,8 @@ package com.greenagri.auth;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Locale;
+import java.util.UUID;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,34 +20,77 @@ import com.greenagri.auth.AuthDtos.RegistroRequest;
 import com.greenagri.auth.AuthDtos.TokenResponse;
 import com.greenagri.auth.AuthDtos.UsuarioResponse;
 import com.greenagri.config.GreenAgriProperties;
+import com.greenagri.seguranca.Auditoria;
+import com.greenagri.seguranca.LimitadorTentativas;
+import com.greenagri.seguranca.PoliticaSenha;
 import com.greenagri.shared.RegraNegocioException;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class AuthService {
+
+	public static final String EMISSOR = "greenagri";
+	private static final String FALHA = "E-mail ou senha inválidos";
 
 	private final UsuarioRepository usuarios;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtEncoder jwtEncoder;
 	private final GreenAgriProperties props;
+	private final LimitadorTentativas limitador;
+	/** Hash fictício: e-mail inexistente também paga o custo do bcrypt (sem enumeração por tempo). */
+	private final String hashFicticio;
+
+	public AuthService(UsuarioRepository usuarios, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder,
+			GreenAgriProperties props, LimitadorTentativas limitador) {
+		this.usuarios = usuarios;
+		this.passwordEncoder = passwordEncoder;
+		this.jwtEncoder = jwtEncoder;
+		this.props = props;
+		this.limitador = limitador;
+		this.hashFicticio = passwordEncoder.encode(UUID.randomUUID().toString());
+	}
 
 	@Transactional(readOnly = true)
-	public TokenResponse login(LoginRequest req) {
-		Usuario usuario = usuarios.findByEmailIgnoreCase(req.email())
-			.filter(u -> passwordEncoder.matches(req.senha(), u.getSenhaHash()))
-			.orElseThrow(() -> new BadCredentialsException("E-mail ou senha inválidos"));
+	public TokenResponse login(LoginRequest req, String ip) {
+		String email = req.email().trim().toLowerCase(Locale.ROOT);
+		// Duas chaves: uma conta sob ataque de vários IPs e um IP testando várias contas.
+		String porConta = "login:" + email + "|" + ip;
+		String porIp = "login-ip:" + ip;
+		limitador.verificar(porConta);
+		limitador.verificar(porIp);
+
+		Usuario usuario = usuarios.findByEmailIgnoreCase(email).orElse(null);
+		boolean ok = passwordEncoder.matches(req.senha(), usuario != null ? usuario.getSenhaHash() : hashFicticio) && usuario != null;
+		if (!ok) {
+			var s = props.seguranca();
+			Duration bloqueio = Duration.ofMinutes(s.bloqueioMinutos());
+			boolean bloqueouConta = limitador.registrar(porConta, s.tentativasLogin(), bloqueio, bloqueio);
+			boolean bloqueouIp = limitador.registrar(porIp, s.tentativasLogin() * 6, bloqueio, bloqueio);
+			if (bloqueouConta || bloqueouIp) {
+				Auditoria.alerta("LOGIN_BLOQUEADO", email, ip, bloqueouIp ? "motivo=ip" : "motivo=conta");
+			}
+			else {
+				Auditoria.evento("LOGIN_FALHOU", email, ip, null);
+			}
+			throw new BadCredentialsException(FALHA); // mesma mensagem para e-mail ou senha errados
+		}
+		limitador.limpar(porConta);
+		Auditoria.evento("LOGIN_OK", email, ip, null);
 		return emitirToken(usuario);
 	}
 
 	@Transactional
-	public TokenResponse registrar(RegistroRequest req) {
-		if (usuarios.existsByEmailIgnoreCase(req.email())) {
+	public TokenResponse registrar(RegistroRequest req, String ip) {
+		String chave = "registro:" + ip;
+		limitador.verificar(chave);
+		limitador.registrar(chave, props.seguranca().cadastrosPorHora(), Duration.ofHours(1), Duration.ofHours(1));
+
+		String email = req.email().trim().toLowerCase(Locale.ROOT);
+		PoliticaSenha.validar(req.senha(), email, req.nome());
+		if (usuarios.existsByEmailIgnoreCase(email)) {
 			throw new RegraNegocioException("Já existe uma conta com este e-mail");
 		}
-		Usuario usuario = usuarios.save(new Usuario(req.nome(), req.email().toLowerCase(),
-				passwordEncoder.encode(req.senha()), Perfil.OPERADOR));
+		Usuario usuario = usuarios.save(new Usuario(req.nome().trim(), email, passwordEncoder.encode(req.senha()), Perfil.OPERADOR));
+		Auditoria.evento("CONTA_CRIADA", email, ip, null);
 		return emitirToken(usuario);
 	}
 
@@ -53,9 +98,11 @@ public class AuthService {
 		Duration validade = Duration.ofHours(props.jwt().expiracaoHoras());
 		Instant agora = Instant.now();
 		JwtClaimsSet claims = JwtClaimsSet.builder()
-			.issuer("greenagri")
+			.issuer(EMISSOR)
+			.id(UUID.randomUUID().toString())
 			.subject(usuario.getEmail())
 			.issuedAt(agora)
+			.notBefore(agora)
 			.expiresAt(agora.plus(validade))
 			.claim("nome", usuario.getNome())
 			.claim("perfil", usuario.getPerfil().name())

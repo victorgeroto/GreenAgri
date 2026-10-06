@@ -9,13 +9,13 @@ public final class AuthDtos {
 	private AuthDtos() {
 	}
 
-	public record LoginRequest(@NotBlank @Email String email, @NotBlank String senha) {
+	public record LoginRequest(@NotBlank @Email @Size(max = 160) String email, @NotBlank @Size(max = 128) String senha) {
 	}
 
 	public record RegistroRequest(
 			@NotBlank @Size(max = 120) String nome,
-			@NotBlank @Email String email,
-			@NotBlank @Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres") String senha) {
+			@NotBlank @Email @Size(max = 160) String email,
+			@NotBlank @Size(min = 10, max = 128, message = "A senha deve ter de 10 a 128 caracteres") String senha) {
 	}
 
 	public record UsuarioResponse(Long id, String nome, String email, Perfil perfil) {

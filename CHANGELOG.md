@@ -11,6 +11,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Foto nos lançamentos de estoque.
 - Diálogos de confirmação e avisos no visual do app (no lugar das caixas do navegador).
 
+### Segurança
+- Credenciais de demonstração removidas do código, da documentação e da tela de login; senha e chaves são geradas localmente na primeira execução.
+- Bloqueio contra força bruta no login, limite de cadastros por IP e política de senha forte (bcrypt custo 12).
+- Cabeçalhos de segurança (CSP, HSTS, anti-clickjacking) na API e no app; limite de tamanho das requisições.
+- Produção exige segredos fortes (JWT, banco) e desliga Swagger e console H2; Docker com segredos no .env.
+- Auditoria de eventos de segurança, CodeQL, Dependabot e npm audit no CI. Documentação em SECURITY.md e docs/SEGURANCA.md.
+
 ### Corrigido
 - A janela nativa de usuário e senha do navegador podia aparecer quando um servidor antigo pedia autenticação Basic.
 

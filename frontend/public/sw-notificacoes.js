@@ -2,7 +2,9 @@
 // do sistema, foca uma aba do GreenAgri (ou abre uma) na tela do aviso.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = new URL(event.notification.data?.url || '/', self.location.origin).href
+  // Só caminhos internos do próprio app (evita redirecionamento para fora).
+  const destino = new URL(event.notification.data?.url || '/', self.location.origin)
+  const url = destino.origin === self.location.origin ? destino.href : self.location.origin + '/'
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((abas) => {
       const aba = abas.find((c) => c.url.startsWith(self.location.origin))

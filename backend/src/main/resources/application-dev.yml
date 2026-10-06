@@ -9,5 +9,10 @@ spring:
       path: /h2-console
 
 greenagri:
+  jwt:
+    # Segredo só para desenvolvimento local; produção exige GREENAGRI_JWT_SECRET.
+    secret: ${GREENAGRI_JWT_SECRET:dev-only-secret-nao-usar-em-producao-0123456789}
   seed:
     enabled: true
+    # Senha e chaves de demonstração geradas na primeira execução (ver CredenciaisDemo).
+    senha: ${GREENAGRI_DEMO_SENHA:}

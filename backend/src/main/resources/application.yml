@@ -18,6 +18,9 @@ server:
   port: 8080
   error:
     include-message: always
+    include-stacktrace: never
+  # Atrás de proxy/nginx: usa X-Forwarded-* (IP real no limite de tentativas, HTTPS no HSTS).
+  forward-headers-strategy: framework
 
 management:
   endpoints:
@@ -31,11 +34,19 @@ springdoc:
 
 greenagri:
   jwt:
-    # Em produção defina GREENAGRI_JWT_SECRET com pelo menos 32 caracteres.
-    secret: ${GREENAGRI_JWT_SECRET:dev-secret-greenagri-trocar-em-producao-0123456789}
-    expiracao-horas: 12
+    # Obrigatório fora do perfil dev: segredo aleatório de pelo menos 32 caracteres.
+    secret: ${GREENAGRI_JWT_SECRET}
+    expiracao-horas: 8
   cors:
     origens: ${GREENAGRI_CORS_ORIGENS:http://localhost:5173,http://localhost:4173}
+  seguranca:
+    # Bloqueio contra força bruta no login (por e-mail + IP).
+    tentativas-login: 5
+    bloqueio-minutos: 15
+    # Cadastros de conta por IP a cada hora.
+    cadastros-por-hora: 5
+    # Corpo máximo das requisições (fotos já chegam reduzidas a ~300 KB).
+    tamanho-maximo-kb: 1024
   iot:
     # Janela sem contato após a qual o dispositivo é exibido como offline.
     minutos-offline: 30

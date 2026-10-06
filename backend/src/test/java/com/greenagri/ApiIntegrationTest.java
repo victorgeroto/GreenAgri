@@ -48,7 +48,7 @@ class ApiIntegrationTest {
 	@Test
 	void loginComCredenciaisDeDemonstracao() throws Exception {
 		mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
-			.content("{\"email\":\"admin@greenagri.dev\",\"senha\":\"greenagri123\"}"))
+			.content("{\"email\":\"admin@greenagri.dev\",\"senha\":\"Teste-Seguro-2026\"}"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.token").isNotEmpty())
 			.andExpect(jsonPath("$.usuario.perfil").value("ADMIN"));
@@ -138,7 +138,7 @@ class ApiIntegrationTest {
 		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "chave-errada")
 			.contentType(MediaType.APPLICATION_JSON).content(lote)).andExpect(status().isUnauthorized());
 
-		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "dev-key-solo-t02")
+		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "teste-solo-t02")
 			.contentType(MediaType.APPLICATION_JSON).content(lote))
 			.andExpect(status().isAccepted())
 			.andExpect(jsonPath("$.aceitas").value(1))
@@ -164,7 +164,7 @@ class ApiIntegrationTest {
 				  {"ts":%d,"lat":%s,"lon":%s,"vel":6.5,"op":true}]}
 				""".formatted(agora - 30, agora, t04.get("latitude").asText(), t04.get("longitude").asText());
 
-		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "dev-key-rast-ch01")
+		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "teste-rast-ch01")
 			.contentType(MediaType.APPLICATION_JSON).content(lote))
 			.andExpect(status().isAccepted())
 			.andExpect(jsonPath("$.mudancasStatus").value(1));
@@ -182,7 +182,7 @@ class ApiIntegrationTest {
 		String lote = """
 				{"codigo":"RAST-CH01","leituras":[{"ts":%d,"lat":-24.8800,"lon":-53.5600,"vel":4,"op":true}]}
 				""".formatted(System.currentTimeMillis() / 1000 + 60);
-		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "dev-key-rast-ch01")
+		mvc.perform(post("/api/iot/telemetria").header("X-Device-Key", "teste-rast-ch01")
 			.contentType(MediaType.APPLICATION_JSON).content(lote))
 			.andExpect(jsonPath("$.mudancasStatus").value(0));
 	}
