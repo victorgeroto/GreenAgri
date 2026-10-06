@@ -39,10 +39,15 @@ node firmware/simulador/simulador.mjs
 ### Com Docker
 
 ```bash
+cp .env.example .env   # preencha DB_PASSWORD e GREENAGRI_JWT_SECRET (openssl rand -base64 48)
 docker compose up --build
 ```
 
-O app fica em http://localhost:8081 e a API em http://localhost:8080, com PostgreSQL persistente e dados de demonstração carregados no primeiro start. Em produção, defina `GREENAGRI_JWT_SECRET`.
+O app fica em http://localhost:8081 com PostgreSQL persistente. A API não é publicada diretamente: só é acessível pelo nginx (`/api`). Sem os segredos do `.env`, o compose e a API se recusam a subir. Para carregar as fazendas de demonstração, use `GREENAGRI_SEED=true` e defina `GREENAGRI_DEMO_SENHA`.
+
+### Credenciais de demonstração
+
+No perfil `dev`, a senha dos usuários de demonstração e as chaves dos dispositivos são **geradas aleatoriamente** na primeira execução e gravadas em `.greenagri-demo/credenciais.json` (ignorado pelo Git). O arquivo é reaproveitado nas execuções seguintes, e o simulador lê as chaves dele. Para fixar a senha, defina `GREENAGRI_DEMO_SENHA`. Os testes usam valores próprios (`src/test/resources/application-dev.properties`).
 
 ## Testes
 

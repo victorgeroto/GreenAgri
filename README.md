@@ -124,6 +124,18 @@ Com o celular e o computador na mesma rede Wi-Fi:
 
 Pelo endereço da rede local o app funciona normalmente, mas **instalar na tela inicial, o modo offline e as notificações do aparelho exigem HTTPS**, porque o navegador só libera esses recursos em conexões seguras (ou em `localhost`). Para testar essas partes no celular, publique um endereço HTTPS temporário com um túnel gratuito, por exemplo `npx cloudflared tunnel --url http://localhost:5173`, e abra no celular o link `https://...trycloudflare.com` exibido.
 
+## Segurança
+
+O GreenAgri foi construído com segurança desde o início, seguindo o **OWASP Top 10** e a **LGPD**:
+
+- Senhas com bcrypt, política de senha forte e **bloqueio contra força bruta** no login.
+- Cada fazenda totalmente isolada no banco e acesso só de quem é membro.
+- Cabeçalhos de segurança (CSP, HSTS, proteção contra clickjacking), sem segredos no código e configuração de produção que **não sobe com senhas fracas**.
+- Registro de auditoria dos eventos de segurança, sem expor dados pessoais.
+- Análise automática de código (CodeQL) e de dependências (Dependabot e `npm audit`) a cada alteração.
+
+Detalhes em [docs/SEGURANCA.md](docs/SEGURANCA.md).
+
 ## Instale na tela inicial
 
 O GreenAgri é um app web instalável (PWA), sem precisar de loja de aplicativos:
@@ -132,12 +144,9 @@ O GreenAgri é um app web instalável (PWA), sem precisar de loja de aplicativos
 - **iPhone (Safari):** botão Compartilhar → *Adicionar à Tela de Início*.
 - **Computador (Chrome/Edge):** ícone de instalação na barra de endereço.
 
-## Acesso de demonstração
+## Ambiente de demonstração
 
-| Perfil | E-mail | Senha | O que pode fazer |
-|---|---|---|---|
-| Administrador | `admin@greenagri.dev` | `greenagri123` | Tudo, inclusive excluir produtos e cadastrar sensores. Acessa as **duas fazendas** |
-| Operador | `operador@greenagri.dev` | `greenagri123` | Lançamentos, colheitas, frota e equipe. Acessa só a Santa Helena |
+Rodando localmente (perfil de desenvolvimento), o sistema cria dois usuários de demonstração: um **administrador**, com acesso às duas fazendas, e um **operador**, com acesso só à Santa Helena. **Nenhuma senha fica no código ou na documentação**: na primeira execução, a senha e as chaves dos sensores são geradas aleatoriamente e gravadas em `.greenagri-demo/credenciais.json`, um arquivo local ignorado pelo Git. Abra esse arquivo para ver os e-mails e a senha.
 
 Também é possível criar uma conta nova pela tela de login (perfil Operador). No primeiro acesso, o app pede para cadastrar a primeira fazenda.
 
@@ -182,7 +191,8 @@ docker compose up --build
 | [docs/SISTEMA-EMBARCADO.md](docs/SISTEMA-EMBARCADO.md) | Firmware ESP32, rastreador com geofence de talhões, protocolo de telemetria, hardware, consumo e roadmap |
 | [firmware/README.md](firmware/README.md) | Como gravar o firmware e usar o simulador |
 | [CHANGELOG.md](CHANGELOG.md) | Histórico de versões |
-| Swagger | http://localhost:8080/swagger-ui.html com a API rodando |
+| Swagger | http://localhost:8080/swagger-ui.html com a API rodando (só em desenvolvimento) |
+| [SECURITY.md](SECURITY.md) · [docs/SEGURANCA.md](docs/SEGURANCA.md) | Como reportar vulnerabilidades e as medidas de segurança do sistema |
 
 **Tecnologias:** Java 21 · Spring Boot 3.5 · Spring Security (JWT) · JPA · Flyway · PostgreSQL/H2 · React 18 · TypeScript · Vite · Tailwind CSS · TanStack Query · IndexedDB (Dexie) · Workbox (PWA) · Recharts · Leaflet + OpenStreetMap · ESP32 + GNSS (C++/PlatformIO) · Docker · GitHub Actions
 
