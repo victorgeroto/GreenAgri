@@ -4,12 +4,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.greenagri.seguranca.MuitasTentativasException;
 
 /** Converte exceções em respostas RFC 7807 (application/problem+json). */
 @RestControllerAdvice
@@ -23,6 +27,13 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(RegraNegocioException.class)
 	ProblemDetail regraNegocio(RegraNegocioException ex) {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+	}
+
+	@ExceptionHandler(MuitasTentativasException.class)
+	ResponseEntity<ProblemDetail> muitasTentativas(MuitasTentativasException ex) {
+		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+			.header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.segundos()))
+			.body(ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage()));
 	}
 
 	@ExceptionHandler(BadCredentialsException.class)
@@ -44,5 +55,16 @@ public class ApiExceptionHandler {
 			.forEach(e -> campos.putIfAbsent(e.getField(), e.getDefaultMessage()));
 		problem.setProperty("campos", campos);
 		return problem;
+	}
+
+	/** Qualquer erro não tratado: registra o detalhe no servidor e responde sem expor internos. */
+	@ExceptionHandler(Exception.class)
+	ProblemDetail inesperado(Exception ex) throws Exception {
+		if (ex instanceof org.springframework.web.ErrorResponse || ex instanceof org.springframework.security.access.AccessDeniedException
+				|| ex instanceof org.springframework.security.core.AuthenticationException) {
+			throw ex; // respostas padrão do Spring (404, 405, 403, 401...)
+		}
+		org.slf4j.LoggerFactory.getLogger(ApiExceptionHandler.class).error("Erro não tratado", ex);
+		return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno. Tente novamente mais tarde.");
 	}
 }

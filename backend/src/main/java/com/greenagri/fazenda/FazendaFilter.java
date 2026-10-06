@@ -12,6 +12,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.greenagri.seguranca.Auditoria;
+
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -49,6 +51,7 @@ public class FazendaFilter extends OncePerRequestFilter {
 			return;
 		}
 		if (!fazendas.temAcesso(fazendaId, jwt.getName())) {
+			Auditoria.alerta("ACESSO_FAZENDA_NEGADO", jwt.getName(), request.getRemoteAddr(), "fazenda=" + fazendaId);
 			erro(response, HttpStatus.FORBIDDEN, "Você não tem acesso a esta fazenda");
 			return;
 		}
