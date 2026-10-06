@@ -1,4 +1,5 @@
 /// <reference types="vitest" />
+import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -16,6 +17,15 @@ const proxyApi = {
       delete res.headers['www-authenticate']
     }),
 }
+
+// Mesmos cabeçalhos de segurança do nginx de produção (security-headers.conf), para o
+// `npm run preview` detectar cedo qualquer violação de CSP. Fora do HTTPS o
+// upgrade-insecure-requests e o HSTS não se aplicam.
+const cabecalhosSeguranca = Object.fromEntries(
+  [...readFileSync(new URL('./security-headers.conf', import.meta.url), 'utf8').matchAll(/^add_header ([\w-]+) "([^"]+)"/gm)]
+    .filter(([, nome]) => nome !== 'Strict-Transport-Security')
+    .map(([, nome, valor]) => [nome, valor.replace('; upgrade-insecure-requests', '')]),
+)
 
 export default defineConfig({
   resolve: {
@@ -74,6 +84,7 @@ export default defineConfig({
   },
   preview: {
     port: 4173,
+    headers: cabecalhosSeguranca,
     proxy: {
       '/api': proxyApi,
     },

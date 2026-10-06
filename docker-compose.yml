@@ -1,32 +1,40 @@
+# Segredos vêm do arquivo .env (copie .env.example e preencha). Sem eles, o compose não sobe.
 services:
   db:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: greenagri
-      POSTGRES_USER: greenagri
-      POSTGRES_PASSWORD: greenagri
+      POSTGRES_USER: ${DB_USER:?defina DB_USER no .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD no .env}
     volumes:
       - dados:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U greenagri"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 5s
       retries: 10
+    # Sem portas publicadas: o banco só é acessível pela rede interna do compose.
 
   backend:
     build: ./backend
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       DB_URL: jdbc:postgresql://db:5432/greenagri
-      DB_USER: greenagri
-      DB_PASSWORD: greenagri
-      GREENAGRI_JWT_SECRET: ${GREENAGRI_JWT_SECRET:-troque-este-segredo-por-um-valor-longo-e-aleatorio}
-      GREENAGRI_CORS_ORIGENS: http://localhost:8081
-      # Carrega os dados de demonstração no primeiro start (banco vazio).
-      GREENAGRI_SEED: "true"
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      GREENAGRI_JWT_SECRET: ${GREENAGRI_JWT_SECRET:?defina GREENAGRI_JWT_SECRET no .env}
+      GREENAGRI_CORS_ORIGENS: ${GREENAGRI_CORS_ORIGENS:-http://localhost:8081}
+      # Dados de demonstração só se pedido explicitamente (banco vazio).
+      GREENAGRI_SEED: ${GREENAGRI_SEED:-false}
+      GREENAGRI_DEMO_SENHA: ${GREENAGRI_DEMO_SENHA:-}
     depends_on:
       db:
         condition: service_healthy
-    ports:
-      - "8080:8080"
+    # Sem portas publicadas: a API é acessada só pelo nginx do frontend (/api).
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
 
   frontend:
     build: ./frontend
@@ -34,6 +42,8 @@ services:
       - backend
     ports:
       - "8081:80"
+    security_opt:
+      - no-new-privileges:true
 
 volumes:
   dados:
