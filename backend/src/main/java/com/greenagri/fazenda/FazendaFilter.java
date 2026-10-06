@@ -32,7 +32,8 @@ public class FazendaFilter extends OncePerRequestFilter {
 	protected boolean shouldNotFilter(HttpServletRequest request) {
 		String path = request.getRequestURI();
 		return !path.startsWith("/api/") || path.startsWith("/api/auth/") || path.equals("/api/fazendas")
-				|| path.startsWith("/api/fazendas/") || path.equals("/api/iot/telemetria");
+				|| path.startsWith("/api/fazendas/") || path.equals("/api/conta") || path.startsWith("/api/conta/")
+				|| path.equals("/api/iot/telemetria");
 	}
 
 	@Override

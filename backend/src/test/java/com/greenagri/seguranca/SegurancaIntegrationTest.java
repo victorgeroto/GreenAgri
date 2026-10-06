@@ -100,6 +100,27 @@ class SegurancaIntegrationTest {
 	}
 
 	@Test
+	void perfilMostraFazendasETrocaSenhaExigeASenhaAtual() throws Exception {
+		String email = "perfil" + System.nanoTime() + "@exemplo.com";
+		String token = com.jayway.jsonpath.JsonPath.read(mvc.perform(post("/api/auth/registro").with(ip("10.5.0.1")).contentType(MediaType.APPLICATION_JSON)
+			.content("{\"nome\":\"Rita Lopes\",\"email\":\"%s\",\"senha\":\"Cerrado-Verde-41\"}".formatted(email)))
+			.andExpect(status().isCreated()).andReturn().getResponse().getContentAsString(), "$.token");
+		mvc.perform(get("/api/conta").header("Authorization", "Bearer " + token))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.email").value(email))
+			.andExpect(jsonPath("$.perfil").value("OPERADOR"))
+			.andExpect(jsonPath("$.fazendas").isEmpty());
+		mvc.perform(post("/api/conta/senha").header("Authorization", "Bearer " + token).contentType(MediaType.APPLICATION_JSON)
+			.content("{\"senhaAtual\":\"errada-123\",\"novaSenha\":\"Ipe-Roxo-2027\"}"))
+			.andExpect(status().isUnprocessableEntity());
+		mvc.perform(post("/api/conta/senha").header("Authorization", "Bearer " + token).contentType(MediaType.APPLICATION_JSON)
+			.content("{\"senhaAtual\":\"Cerrado-Verde-41\",\"novaSenha\":\"Ipe-Roxo-2027\"}"))
+			.andExpect(status().isNoContent());
+		mvc.perform(post("/api/auth/login").with(ip("10.5.0.2")).contentType(MediaType.APPLICATION_JSON).content(login(email, "Ipe-Roxo-2027")))
+			.andExpect(status().isOk());
+	}
+
+	@Test
 	void respostasTrazemCabecalhosDeSeguranca() throws Exception {
 		mvc.perform(get("/api/produtos"))
 			.andExpect(status().isUnauthorized())
